@@ -43,6 +43,7 @@ def parse_qs(query):
     interface = args[0]
     if IMAGE_INFO   == interface:
         encoded["interface"] = IMAGE_INFO
+
     elif IMAGE_VIEW == interface:
         if len(args) <= 2:
             return
@@ -54,12 +55,16 @@ def parse_qs(query):
 
     elif EXIF       == interface:
         encoded["interface"] = EXIF
+
     elif IMAGE_MOGR == interface:
         encoded["interface"] = IMAGE_MOGR
+
     elif WATER_MARK == interface:
         encoded["interface"] = WATER_MARK
+
     elif IMAGE_AVE  == interface:
         encoded["interface"] = IMAGE_AVE
+
     else:
         return
     return encoded
@@ -69,18 +74,9 @@ class BaseImageHandler(tornado.web.RequestHandler):
     """docstring for BaseImageHandler"""
     def __init__(self, application, request, **kwargs):
         uri = request.uri
-        # 此处扩展原生的request对象，使用不同的参数解析规则
-        # eg: /w/2/h/3
-        # parse_qs
         params = parse_qs(request.query)
         if params:
             merge_dict(request.arguments, params)
             request.query_arguments = copy.deepcopy(request.arguments)
-        super(BaseImageHandler, self).__init__(application, request, **kwargs)
 
-# source = {"w" : 1, "h": 2}
-# target = {"r": 3}
-# merge_dict(source, target)
-# print source
-# dict3 = {"w": 3, "r": [4, 5]}
-# print merge_dict(source, dict3)
+        super(BaseImageHandler, self).__init__(application, request, **kwargs)
