@@ -24,7 +24,6 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", HomeHandler),
             (r"/upload", UploadHandler),
-            (r"/photos", PhotoHandler),
             (r"/(.+)\.(jpg|gif|png)", ImageViewHandler),
             (r"/test", TestHandler),
             (r"/img_view_test", ImageViewTestHandler)
