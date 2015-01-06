@@ -46,24 +46,26 @@ class ImageViewHandler(BaseImageHandler):
             format    = self.get_argument("format", None)
             interlace = self.get_argument("interlace", None)
 
+
+            if format: # 放到前面，保证支持格式转换
+                ext = format
+
             size = im.size
             if "0"   == mode:
                 if not w or not h: # 暂时返回原图，后期改为参数错误
-                    self.write_image(im, file_name, ext)
-                    return
-                long_edge = max(size)
-                short_edge = min(size)
+                    long_edge = max(size)
+                    short_edge = min(size)
 
-                w = int(w)
-                h = int(h)
+                    w = int(w)
+                    h = int(h)
 
-                ratio_long = w / long_edge
-                ratio_short = h / short_edge
+                    ratio_long = w / long_edge
+                    ratio_short = h / short_edge
 
-                ratio = min(ratio_long, ratio_short)
-                resize = tuple(int(x * ratio) for x in size)
+                    ratio = min(ratio_long, ratio_short)
+                    resize = tuple(int(x * ratio) for x in size)
 
-                im = im.resize(tuple(resize))
+                    im = im.resize(tuple(resize))
             elif "1" == mode:
                 if not w and not h: # 暂时返回原图，后期改为参数错误
                     self.write_image(im, file_name, ext)
@@ -182,9 +184,6 @@ class ImageViewHandler(BaseImageHandler):
                 im = im.resize(resize).crop(tuple(box))
             else:
                 pass
-
-            if format:
-                ext = format
 
             self.write_image(im, file_name, ext)
         elif EXIF       == interface:
