@@ -20,6 +20,15 @@ IMAGE_MOGR = "imageMogr"
 WATER_MARK = "watermark"
 IMAGE_AVE  = "imageAve"
 
+# @see https://infohost.nmt.edu/tcc/help/pubs/pil/formats.html
+# http://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html
+IMAGE_FORMATS = {
+    "jgp": "JPEG",
+    "gif": "GIF",
+    "png": "PNG",
+    "webp": "WebP"
+}
+
 def merge_dict(source, target):
     # keys = [key for key in source]
     keys = list(source)[:]
@@ -90,11 +99,14 @@ class BaseImageHandler(tornado.web.RequestHandler):
     def write_image(self, image, file_name, ext):
         #下面是获取要显示或保存的图像数据
         output = StringIO()
-        image.save(output, 'JPEG', quality = 80)
+        format = IMAGE_FORMATS.get(ext, "JPEG")
+        logging.debug(format)
+        image.save(output, format, quality = 80)
         img_data = output.getvalue()
         output.close()
         #在浏览器现实图片
-        contentType = MIME.get(ext.lower(), "text/plain")
+        # contentType = MIME.get(ext.lower(), "text/plain")
+        contentType = MIME.get(ext.lower(), "image/jpeg")
         self.set_header("Content-Type", contentType)
         expiry_time = datetime.datetime.utcnow() + datetime.timedelta(100)
         self.set_header("Expires", expiry_time.strftime("%a, %d %b %Y %H:%M:%S GMT"))

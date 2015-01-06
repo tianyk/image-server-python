@@ -43,6 +43,8 @@ class ImageViewHandler(BaseImageHandler):
             mode      = self.get_argument("mode", None)
             w         = self.get_argument("w", None)
             h         = self.get_argument("h", None)
+            format    = self.get_argument("format", None)
+            interlace = self.get_argument("interlace", None)
 
             size = im.size
             if "0"   == mode:
@@ -62,7 +64,6 @@ class ImageViewHandler(BaseImageHandler):
                 resize = tuple(int(x * ratio) for x in size)
 
                 im = im.resize(tuple(resize))
-                self.write_image(im, file_name, ext)
             elif "1" == mode:
                 if not w and not h: # 暂时返回原图，后期改为参数错误
                     self.write_image(im, file_name, ext)
@@ -107,8 +108,6 @@ class ImageViewHandler(BaseImageHandler):
                     box[3] = h + box[1]
 
                 im = im.crop(tuple(box))
-                self.write_image(im, file_name, ext)
-
             elif "2" == mode:
                 if not w and not h: # 暂时返回原图，后期改为参数错误
                     self.write_image(im, file_name, ext)
@@ -124,7 +123,6 @@ class ImageViewHandler(BaseImageHandler):
                 h = int(h)
 
                 im = im.resize((w, h))
-                self.write_image(im, file_name, ext)
             elif "3" == mode:
                 if not w or not h: # 暂时返回原图，后期改为参数错误
                     self.write_image(im, file_name, ext)
@@ -146,8 +144,6 @@ class ImageViewHandler(BaseImageHandler):
                     resize = tuple(int(x * ratio_h) for x in size)
 
                 im = im.resize(tuple(resize))
-                self.write_image(im, file_name, ext)
-
             elif "4" == mode:
                 if not w or not h: # 暂时返回原图，后期改为参数错误
                     self.write_image(im, file_name, ext)
@@ -165,8 +161,6 @@ class ImageViewHandler(BaseImageHandler):
                 resize = tuple(int(x * ratio) for x in size)
 
                 im = im.resize(tuple(resize))
-                self.write_image(im, file_name, ext)
-
             elif "5" == mode:
                 if not w or not h: # 暂时返回原图，后期改为参数错误
                     self.write_image(im, file_name, ext)
@@ -176,9 +170,7 @@ class ImageViewHandler(BaseImageHandler):
                 w = int(w)
                 h = int(h)
 
-                ratio_long = w / long_edge
-                ratio_short = h / short_edge
-                ratio = max(ratio_long, ratio_short)
+                ratio = max(w / long_edge, h / short_edge)
                 resize = tuple(int(x * ratio) for x in size)
 
                 box = [0, resize[0], resize[1], 0]
@@ -188,9 +180,13 @@ class ImageViewHandler(BaseImageHandler):
                 box[3] = short_edge + box[1]
 
                 im = im.resize(resize).crop(tuple(box))
-                self.write_image(im, file_name, ext)
             else:
-                self.write_image(im, file_name, ext)
+                pass
+
+            if format:
+                ext = format
+
+            self.write_image(im, file_name, ext)
         elif EXIF       == interface:
             pass
         elif IMAGE_MOGR == interface:
