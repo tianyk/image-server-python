@@ -15,8 +15,6 @@ from handlers import HomeHandler, UploadHandler, PhotoHandler, ImageViewHandler,
 
 define("port", default=8888, help="run on the given port", type=int)
 # define("log_file_prefix", default="logs/tornado.log", help="logging_level")
-tornado.options.parse_command_line()
-
 
 #
 class Application(tornado.web.Application):
