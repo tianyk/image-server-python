@@ -10,7 +10,7 @@ except ImportError:
     from StringIO import StringIO
 import datetime
 import tornado.web
-
+from PIL import ImageFile, ExifTags.TAGS
 from libs import MIME
 
 IMAGE_INFO = "imageInfo"
@@ -101,7 +101,14 @@ class BaseImageHandler(tornado.web.RequestHandler):
         output = StringIO()
         format = IMAGE_FORMATS.get(ext, "JPEG")
         logging.debug(format)
-        image.save(output, format, quality = 80)
+
+        # image.save(output, format, quality = 80)
+        try:
+            image.save(output, "JPEG", quality=80, optimize=True, progressive=True)
+        except IOError:
+            ImageFile.MAXBLOCK = image.size[0] * image.size[1]
+            image.save(output, "JPEG", quality=80, optimize=True, progressive=True)
+
         img_data = output.getvalue()
         output.close()
         #在浏览器现实图片
@@ -116,4 +123,5 @@ class BaseImageHandler(tornado.web.RequestHandler):
     def write_blank(self):
         self.set_status(404)
         self.set_header("Content-Type", "text/plain")
+        self.set_header("Cache-Control", "no-store")
         self.write("This request URL " + self.request.path + " was not found on this server.")

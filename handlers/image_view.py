@@ -24,7 +24,8 @@ class ImageViewHandler(BaseImageHandler):
         try:
             im = Image.open(file_path)
         except IOError:
-            write_blank()
+            self.write_blank()
+            return
 
         if not interface: # 直接返回原图
             self.write_image(im, file_name, ext)
@@ -187,7 +188,14 @@ class ImageViewHandler(BaseImageHandler):
 
             self.write_image(im, file_name, ext)
         elif EXIF       == interface:
-            pass
+            exif = im._getexif()
+            if exif:
+                # dict(zip(d.keys(), map(lambda x:x * 2, d.values())))
+                # dict((k, v*2) for k, v in {'a': 1, 'b': 2}.items())
+                exif = dict((TAGS.get(k, k), v) for k, v in exif.items())
+                self.write(exif)
+            else:
+                self.write({"errcode": 400, "errmsg": "no exif info"})
         elif IMAGE_MOGR == interface:
             pass
         elif WATER_MARK == interface:
