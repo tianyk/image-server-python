@@ -16,6 +16,98 @@ IMAGE_MOGR = "imageMogr"
 WATER_MARK = "watermark"
 IMAGE_AVE  = "imageAve"
 
+def mode_0(im, long_edge, short_edge):
+    """
+        长边最多为long_edge，短边最多为short_edge
+        eg:
+                w = 1000
+                h = 600
+                origin_long_edge = 1000
+                origin_short_edge = 600
+
+                long_edge = 800
+                short_edge = 600
+
+                ratio_long = 800 / 1000 = 0.8
+                ratio_short = 600 / 600 = 1
+                # 取比例的最小值
+                min_ratio = 0.8
+
+                resize_long_edge = 1000 * 0.8 = 800 # 长边最多800
+                resize_short_edge = 600 * 0.8 = 480 # 短边最多600
+    """
+    if not long_edge and not short_edge: # 暂时返回原图，后期改为参数错误
+        return im
+    size = im.size()
+    origin_long_edge = max(size)
+    origin_short_edge = min(size)
+
+    w = int(w)
+    h = int(h)
+
+    ratio_long = ratio_short = -1
+    if long_edge:
+        ratio_long = long_edge / origin_long_edge
+    if short_edge:
+        ratio_short = short_edge / origin_short_edge
+
+    if -1 == ratio_long:
+        ratio_long = ratio_short
+    elif -1 == ratio_short:
+        ratio_short = ratio_long
+
+    min_ratio = min(ratio_long, ratio_short)
+    resize = tuple(int(x * min_ratio) for x in size)
+
+    im = im.resize(resize)
+    return im
+
+def mode_4(im, long_edge, short_edge):
+    """
+        长边最少为long_edge，短边最少为short_edge
+        eg:
+                w = 1000
+                h = 600
+                origin_long_edge = 1000
+                origin_short_edge = 600
+
+                long_edge = 800
+                short_edge = 800
+
+                ratio_long = 800 / 1000 = 0.8
+                ratio_short = 800 / 600 = 1.34
+                # 取比例的最小值
+                max_ratio = 1
+
+                resize_long_edge = 1000 * 1.34 = 1340 # 长边最少800
+                resize_short_edge = 600 * 1.34 = 800 # 短边最少800
+    """
+    if not long_edge and not short_edge: # 暂时返回原图，后期改为参数错误
+        return im
+    size = im.size()
+    origin_long_edge = max(size)
+    origin_short_edge = min(size)
+
+    w = int(w)
+    h = int(h)
+
+    ratio_long = ratio_short = -1
+    if long_edge:
+        ratio_long = long_edge / origin_long_edge
+    if short_edge:
+        ratio_short = short_edge / origin_short_edge
+
+    if -1 == ratio_long:
+        ratio_long = ratio_short
+    elif -1 == ratio_short:
+        ratio_short = ratio_long
+
+    min_ratio = min(ratio_long, ratio_short)
+    resize = tuple(int(x * min_ratio) for x in size)
+
+    im = im.resize(resize)
+    return im
+
 class ImageViewHandler(BaseImageHandler):
     def get(self, file_name, ext):
         interface = self.get_argument("interface", None)
