@@ -10,7 +10,7 @@ except ImportError:
     from StringIO import StringIO
 import datetime
 import tornado.web
-from PIL import ImageFile, ExifTags.TAGS
+from PIL import ImageFile
 from libs import MIME
 
 IMAGE_INFO = "imageInfo"

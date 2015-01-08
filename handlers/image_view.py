@@ -5,7 +5,7 @@ from __future__ import division
 import re
 import logging
 import tornado.web
-from PIL import Image
+from PIL import Image, ExifTags
 
 from base_image import BaseImageHandler
 
@@ -192,7 +192,7 @@ class ImageViewHandler(BaseImageHandler):
             if exif:
                 # dict(zip(d.keys(), map(lambda x:x * 2, d.values())))
                 # dict((k, v*2) for k, v in {'a': 1, 'b': 2}.items())
-                exif = dict((TAGS.get(k, k), v) for k, v in exif.items())
+                exif = dict((ExifTags.TAGS.get(k, k), v) for k, v in exif.items())
                 self.write(exif)
             else:
                 self.write({"errcode": 400, "errmsg": "no exif info"})
