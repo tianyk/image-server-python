@@ -96,23 +96,21 @@ class BaseImageHandler(tornado.web.RequestHandler):
 
         super(BaseImageHandler, self).__init__(application, request, **kwargs)
 
-    def write_image(self, image, file_name, ext):
-        #下面是获取要显示或保存的图像数据
+    def write_image(self, im, file_name, ext, interlace = '0'):
         output = StringIO()
-        format = IMAGE_FORMATS.get(ext, "JPEG")
-        logging.debug(format)
+        format = IMAGE_FORMATS.get(ext.lower(), "JPEG")
 
-        # image.save(output, format, quality = 80)
-        try:
-            image.save(output, "JPEG", quality=80, optimize=True, progressive=True)
-        except IOError:
-            ImageFile.MAXBLOCK = image.size[0] * image.size[1]
-            image.save(output, "JPEG", quality=80, optimize=True, progressive=True)
-
+        if interlace == '1':
+            try:
+                im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
+            except IOError:
+                ImageFile.MAXBLOCK = im.size[0] * im.size[1]
+                im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
+        else:
+            im.save(output, format, quality = 80)
         img_data = output.getvalue()
         output.close()
-        #在浏览器现实图片
-        # contentType = MIME.get(ext.lower(), "text/plain")
+
         contentType = MIME.get(ext.lower(), "image/jpeg")
         self.set_header("Content-Type", contentType)
         expiry_time = datetime.datetime.utcnow() + datetime.timedelta(100)
