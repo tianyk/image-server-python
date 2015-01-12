@@ -22,9 +22,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", HomeHandler),
             (r"/upload", UploadHandler),
-            (r"/(.+)\.(jpg|gif|png)", ImageViewHandler),
-            (r"/test", TestHandler),
-            (r"/img_view_test", ImageViewTestHandler)
+            (r"/(.+)\.(jpg|gif|png)", ImageViewHandler)
         ]
 
         settings = dict(
