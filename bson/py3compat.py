@@ -21,8 +21,6 @@ PY3 = sys.version_info[0] == 3
 if PY3:
     import codecs
 
-    from io import BytesIO as StringIO
-
     def b(s):
         # BSON and socket operations deal in binary data. In
         # python 3 that means instances of `bytes`. In python
@@ -37,8 +35,8 @@ if PY3:
         return bytes.fromhex(h)
 
     binary_type = bytes
-    text_type   = str
-    next_item   = "__next__"
+    text_type = str
+    next_item = "__next__"
 
 else:
     try:
@@ -56,7 +54,7 @@ else:
     binary_type = str
     # 2to3 will convert this to "str". That's okay
     # since we won't ever get here under python3.
-    text_type   = unicode
-    next_item   = "next"
+    text_type = unicode
+    next_item = "next"
 
 string_types = (binary_type, text_type)

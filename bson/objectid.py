@@ -19,11 +19,14 @@
 import binascii
 import calendar
 import datetime
+
 try:
     import hashlib
+
     _md5func = hashlib.md5
 except ImportError:  # for Python < 2.5
     import md5
+
     _md5func = md5.new
 import os
 import random
@@ -38,7 +41,8 @@ from bson.py3compat import (PY3, b, binary_type, text_type,
 from bson.tz_util import utc
 
 EMPTY = b("")
-ZERO  = b("\x00")
+ZERO = b("\x00")
+
 
 def _machine_bytes():
     """Get the machine portion of an ObjectId.

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import random
-from PIL import Image, ImageDraw, ImageEnhance
+from PIL import Image
 
 # file_path = "./static/2850497089250002266.jpg"
 
@@ -47,7 +46,7 @@ from PIL import Image, ImageDraw, ImageEnhance
 # mask = Image.new('L', (100, 100), 0)
 # draw = ImageDraw.Draw(mask)
 # for i in range(5, 100, 10):
-#     draw.line((i, 0, i, 100), fill=random.randrange(256))
+# draw.line((i, 0, i, 100), fill=random.randrange(256))
 #     draw.line((0, i, 100, i), fill=random.randrange(256))
 # # mask.show()
 # result = Image.composite(background, foreground, mask)

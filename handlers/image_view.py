@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-import re
-import logging
-import tornado.web
 from PIL import Image, ExifTags
 
 from base_image import BaseImageHandler
@@ -12,10 +9,11 @@ from libs import image_utils
 
 IMAGE_INFO = "imageInfo"
 IMAGE_VIEW = "imageView"
-EXIF       = "exif"
+EXIF = "exif"
 IMAGE_MOGR = "imageMogr"
 WATER_MARK = "watermark"
-IMAGE_AVE  = "imageAve"
+IMAGE_AVE = "imageAve"
+
 
 class ImageViewHandler(BaseImageHandler):
     def get(self, file_name, ext):
@@ -28,27 +26,27 @@ class ImageViewHandler(BaseImageHandler):
 
         # 接口标识
         interface = self.get_argument("interface", None)
-        if not interface: # 直接返回原图
+        if not interface:  # 直接返回原图
             self.write_image(im, file_name, ext)
 
-        elif IMAGE_INFO == interface: # 图片基本信息
+        elif IMAGE_INFO == interface:  # 图片基本信息
             size = im.size
-            info               = {}
-            info["format"]     = im.format or 'None'
-            info["width"]      = size[0]
-            info["height"]     = size[1]
+            info = {}
+            info["format"] = im.format or 'None'
+            info["width"] = size[0]
+            info["height"] = size[1]
             info["colorModel"] = im.mode
             self.write(info)
 
-        elif IMAGE_VIEW == interface: # 图片处理
-            mode      = self.get_argument("mode", None)
-            w         = self.get_argument("w", None)
-            h         = self.get_argument("h", None)
-            format    = self.get_argument("format", None)
+        elif IMAGE_VIEW == interface:  # 图片处理
+            mode = self.get_argument("mode", None)
+            w = self.get_argument("w", None)
+            h = self.get_argument("h", None)
+            format = self.get_argument("format", None)
             interlace = self.get_argument("interlace", None)
 
             size = im.size
-            if "0"   == mode:
+            if "0" == mode:
                 re_im = image_utils.image_view_mode_0(im, w, h)
                 if re_im:
                     im = re_im
@@ -75,7 +73,7 @@ class ImageViewHandler(BaseImageHandler):
             else:
                 pass
 
-            if format: # 首先校验format是否被支持
+            if format:  # 首先校验format是否被支持
                 ext = format
 
             if interlace:
@@ -83,7 +81,7 @@ class ImageViewHandler(BaseImageHandler):
             else:
                 self.write_image(im, file_name, ext)
 
-        elif EXIF       == interface:
+        elif EXIF == interface:
             exif = im._getexif()
             if exif:
                 # dict(zip(d.keys(), map(lambda x:x * 2, d.values())))
@@ -97,7 +95,7 @@ class ImageViewHandler(BaseImageHandler):
             pass
         elif WATER_MARK == interface:
             pass
-        elif IMAGE_AVE  == interface:
+        elif IMAGE_AVE == interface:
             pass
-        else: # 直接返回原图
+        else:  # 直接返回原图
             self.write_image(im, file_name, ext)

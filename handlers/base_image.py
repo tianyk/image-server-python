@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import copy
-import logging
-import re
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -15,10 +14,10 @@ from libs import MIME
 
 IMAGE_INFO = "imageInfo"
 IMAGE_VIEW = "imageView"
-EXIF       = "exif"
+EXIF = "exif"
 IMAGE_MOGR = "imageMogr"
 WATER_MARK = "watermark"
-IMAGE_AVE  = "imageAve"
+IMAGE_AVE = "imageAve"
 
 # @see https://infohost.nmt.edu/tcc/help/pubs/pil/formats.html
 # http://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html
@@ -28,6 +27,7 @@ IMAGE_FORMATS = {
     "png": "PNG",
     "webp": "WebP"
 }
+
 
 def merge_dict(source, target):
     # keys = [key for key in source]
@@ -49,6 +49,7 @@ def merge_dict(source, target):
 
     return source
 
+
 def parse_qs(query):
     if not query:
         return
@@ -56,7 +57,7 @@ def parse_qs(query):
     encoded = {}
     args = query.split("/")
     interface = args[0]
-    if IMAGE_INFO   == interface:
+    if IMAGE_INFO == interface:
         encoded["interface"] = IMAGE_INFO
 
     elif IMAGE_VIEW == interface:
@@ -68,7 +69,7 @@ def parse_qs(query):
         params = dict(zip(*2 * (iter(args[2:]),)))
         merge_dict(encoded, params)
 
-    elif EXIF       == interface:
+    elif EXIF == interface:
         encoded["interface"] = EXIF
 
     elif IMAGE_MOGR == interface:
@@ -77,7 +78,7 @@ def parse_qs(query):
     elif WATER_MARK == interface:
         encoded["interface"] = WATER_MARK
 
-    elif IMAGE_AVE  == interface:
+    elif IMAGE_AVE == interface:
         encoded["interface"] = IMAGE_AVE
 
     else:
@@ -87,6 +88,7 @@ def parse_qs(query):
 
 class BaseImageHandler(tornado.web.RequestHandler):
     """docstring for BaseImageHandler"""
+
     def __init__(self, application, request, **kwargs):
         uri = request.uri
         params = parse_qs(request.query)
@@ -96,7 +98,7 @@ class BaseImageHandler(tornado.web.RequestHandler):
 
         super(BaseImageHandler, self).__init__(application, request, **kwargs)
 
-    def write_image(self, im, file_name, ext, interlace = '0'):
+    def write_image(self, im, file_name, ext, interlace='0'):
         output = StringIO()
         format = IMAGE_FORMATS.get(ext.lower(), "JPEG")
 
@@ -107,7 +109,7 @@ class BaseImageHandler(tornado.web.RequestHandler):
                 ImageFile.MAXBLOCK = im.size[0] * im.size[1]
                 im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
         else:
-            im.save(output, format, quality = 80)
+            im.save(output, format, quality=80)
         img_data = output.getvalue()
         output.close()
 

@@ -3,6 +3,7 @@
 
 import re
 
+
 def split_host_and_port(netloc):
     """Returns ``(host, port)`` tuple from ``netloc``.
 
@@ -16,6 +17,7 @@ def split_host_and_port(netloc):
         host = netloc
         port = None
     return (host, port)
+
 
 uri = "http://localhost:8080/photos/1234.jpg?w=200&h=200"
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import random
-from PIL import Image, ImageDraw, ImageColor
+from PIL import Image, ImageDraw
 
 for i in range(1, 11):
     im = Image.new('RGB', (300, 500), '#6699CC')

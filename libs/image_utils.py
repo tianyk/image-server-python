@@ -3,6 +3,7 @@
 
 from __future__ import division
 
+
 def image_view_mode_0(im, long_edge, short_edge):
     """
         限定缩略图的长边最多为<LongEdge>，短边最多为<ShortEdge>，进行等比缩放，不裁剪。
@@ -30,7 +31,7 @@ def image_view_mode_0(im, long_edge, short_edge):
     origin_long_edge = max(size)
     origin_short_edge = min(size)
 
-    ratio_long = ratio_short = 1 # 默认值取1，后期取min值，如果min值大于1直接返回。如果不返回，必有一个小于1。
+    ratio_long = ratio_short = 1  # 默认值取1，后期取min值，如果min值大于1直接返回。如果不返回，必有一个小于1。
     if long_edge:
         long_edge = int(long_edge)
         ratio_long = long_edge / origin_long_edge
@@ -46,6 +47,7 @@ def image_view_mode_0(im, long_edge, short_edge):
 
     im = im.resize(resize)
     return im
+
 
 def image_view_mode_1(im, w, h):
     """
@@ -72,10 +74,10 @@ def image_view_mode_1(im, w, h):
     max_ratio = max(ratio_w, ratio_h)
     min_ratio = min(ratio_w, ratio_h)
 
-    if min_ratio >= 1: # 两边大
+    if min_ratio >= 1:  # 两边大
         return
 
-    if max_ratio < 1: # 两者均小于原来
+    if max_ratio < 1:  # 两者均小于原来
         size = resize = tuple(int(x * max_ratio) for x in size)
         im = im.resize(resize)
     box = []
@@ -86,6 +88,7 @@ def image_view_mode_1(im, w, h):
 
     im = im.crop(tuple(box))
     return im
+
 
 def image_view_mode_2(im, w, h):
     """
@@ -116,6 +119,7 @@ def image_view_mode_2(im, w, h):
     im = im.resize(resize)
     return im
 
+
 def image_view_mode_3(im, w, h):
     """
     限定缩略图的宽最少为<Width>，高最少为<Height>，进行等比缩放，不裁剪。
@@ -140,6 +144,7 @@ def image_view_mode_3(im, w, h):
     resize = tuple(int(x * max_ratio) for x in size)
     im = im.resize(resize)
     return im
+
 
 def image_view_mode_4(im, long_edge, short_edge):
     """
@@ -170,6 +175,7 @@ def image_view_mode_4(im, long_edge, short_edge):
     resize = tuple(int(x * max_ratio) for x in size)
     im = im.resize(resize)
     return im
+
 
 def image_view_mode_5(im, long_edge, short_edge):
     """
@@ -206,12 +212,12 @@ def image_view_mode_5(im, long_edge, short_edge):
         size = resize = tuple(int(x * max_ratio) for x in size)
         im = im.resize(resize)
 
-    if size[0] >= size[1]: # 横向
+    if size[0] >= size[1]:  # 横向
         box.append(int((size[0] - long_edge) / 2))
         box.append(int((size[1] - short_edge) / 2))
         box.append(box[0] + long_edge)
         box.append(box[1] + short_edge)
-    else: # 竖向
+    else:  # 竖向
         box.append(int((size[0] - short_edge) / 2))
         box.append(int((size[1] - long_edge) / 2))
         box.append(box[0] + short_edge)

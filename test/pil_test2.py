@@ -16,7 +16,7 @@ except IOError:
 from PIL.ExifTags import TAGS
 
 # for k, v in image._getexif().items():
-#     print TAGS.get(k, k), v
+# print TAGS.get(k, k), v
 image = Image.open("upload/p1561863679.jpg")
 if image._getexif():
     # dict(zip(d.keys(), map(lambda x:x * 2, d.values())))
