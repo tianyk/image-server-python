@@ -9,8 +9,7 @@ import tornado.options
 import tornado.web
 from tornado.options import define, options
 
-from handlers import HomeHandler, UploadHandler, ImageViewHandler, TestHandler, ImageViewTestHandler
-
+from handlers import HomeHandler, UploadHandler, ImageViewHandler, TestHandler, ImageViewTestHandler, ParamTestHandler
 
 define("port", default=8888, help="run on the given port", type=int)
 
@@ -22,7 +21,8 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", HomeHandler),
             (r"/upload", UploadHandler),
-            (r"/(.+)\.(jpg|gif|png)", ImageViewHandler)
+            (r"/(.+)\.(jpg|gif|png)", ImageViewHandler),
+            (r"/param", ParamTestHandler)
         ]
 
         settings = dict(

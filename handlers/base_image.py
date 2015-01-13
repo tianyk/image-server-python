@@ -85,18 +85,28 @@ def parse_qs(query):
         return
     return encoded
 
+def check_param(request, getter):
+    print type(request)
+    print type(getter)
+    def no_name(param, fail_msg):
+        print 'invoke...', param, fail_msg
+        methods = {"m1": "m1"}
+        return methods
+    return no_name
 
 class BaseImageHandler(tornado.web.RequestHandler):
     """docstring for BaseImageHandler"""
-
     def __init__(self, application, request, **kwargs):
+        super(BaseImageHandler, self).__init__(application, request, **kwargs)
+
         uri = request.uri
         params = parse_qs(request.query)
         if params:
             merge_dict(request.arguments, params)
             request.query_arguments = copy.deepcopy(request.arguments)
 
-        super(BaseImageHandler, self).__init__(application, request, **kwargs)
+        self.check = check_param(self.request, self.get_arguments)
+
 
     def write_image(self, im, file_name, ext, interlace='0'):
         output = StringIO()
@@ -125,6 +135,3 @@ class BaseImageHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", "text/plain")
         self.set_header("Cache-Control", "no-store")
         self.write("This request URL " + self.request.path + " was not found on this server.")
-
-    def check(self, name):
-        pass
