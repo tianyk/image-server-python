@@ -125,3 +125,6 @@ class BaseImageHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", "text/plain")
         self.set_header("Cache-Control", "no-store")
         self.write("This request URL " + self.request.path + " was not found on this server.")
+
+    def check(self, name):
+        pass
