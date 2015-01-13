@@ -3,7 +3,6 @@
 
 from __future__ import division
 
-
 def image_view_mode_0(im, long_edge, short_edge):
     """
         限定缩略图的长边最多为<LongEdge>，短边最多为<ShortEdge>，进行等比缩放，不裁剪。

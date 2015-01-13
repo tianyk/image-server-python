@@ -5,7 +5,8 @@ from __future__ import division
 from PIL import Image, ExifTags
 
 from base_image import BaseImageHandler
-from libs import image_utils
+from libs import image_utils, upload
+
 
 IMAGE_INFO = "imageInfo"
 IMAGE_VIEW = "imageView"
@@ -14,12 +15,18 @@ IMAGE_MOGR = "imageMogr"
 WATER_MARK = "watermark"
 IMAGE_AVE = "imageAve"
 
+UPLOAD_DIR = 'upload/'
+
 
 class ImageViewHandler(BaseImageHandler):
-    def get(self, file_name, ext):
-        file_path = 'upload' + self.request.path
+    def get(self, filename, ext):
+        filepath = upload.get_filepath(filename, ext)
+        if not filepath:
+            self.write_blank()
+            return
+
         try:
-            im = Image.open(file_path)
+            im = Image.open(filepath)
         except IOError:
             self.write_blank()
             return
@@ -27,7 +34,7 @@ class ImageViewHandler(BaseImageHandler):
         # 接口标识
         interface = self.get_argument("interface", None)
         if not interface:  # 直接返回原图
-            self.write_image(im, file_name, ext)
+            self.write_image(im, filename, ext)
 
         elif IMAGE_INFO == interface:  # 图片基本信息
             size = im.size
@@ -77,9 +84,9 @@ class ImageViewHandler(BaseImageHandler):
                 ext = format
 
             if interlace:
-                self.write_image(im, file_name, ext, interlace)
+                self.write_image(im, filename, ext, interlace)
             else:
-                self.write_image(im, file_name, ext)
+                self.write_image(im, filename, ext)
 
         elif EXIF == interface:
             exif = im._getexif()
@@ -98,4 +105,4 @@ class ImageViewHandler(BaseImageHandler):
         elif IMAGE_AVE == interface:
             pass
         else:  # 直接返回原图
-            self.write_image(im, file_name, ext)
+            self.write_image(im, filename, ext)
