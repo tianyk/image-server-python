@@ -10,7 +10,7 @@ except ImportError:
 import datetime
 import tornado.web
 from PIL import ImageFile
-from libs import MIME
+from libs import MIME, validator
 
 IMAGE_INFO = "imageInfo"
 IMAGE_VIEW = "imageView"
@@ -87,13 +87,37 @@ def parse_qs(query):
 
 
 def check_param(request, getter):
-    def no_name(param, fail_msg):
-        print 'invoke...', param, fail_msg
+    def error_handler(msg):
+        print "error", msg
+
+    def check_handler(param, fail_msg):
+        """
+
+        :param param:
+        :param fail_msg:
+        :return:
+        """
+        value = getter(param)
+        print "value", value
         methods = {}
 
+        def method_handler(method_name, *args):
+            def invoke_method(*args):
+                func = getattr(validator, method_name)
+                is_correct = func(value, *args)
+                print "is_correct", is_correct
+                if not is_correct:
+                    error_handler(fail_msg or "Invalid value")
+
+                # 链式调用
+                return methods
+
+            return invoke_method
+
+        methods["equals"] = method_handler("equals")
         return methods
 
-    return no_name
+    return check_handler
 
 
 class BaseImageHandler(tornado.web.RequestHandler):
@@ -108,7 +132,7 @@ class BaseImageHandler(tornado.web.RequestHandler):
             merge_dict(request.arguments, params)
             request.query_arguments = copy.deepcopy(request.arguments)
 
-        self.check = check_param(self.request, self.get_arguments)
+        self.check = check_param(self.request, self.get_argument)
 
     def write_image(self, im, file_name, ext, interlace='0'):
         output = StringIO()
