@@ -15,3 +15,13 @@ class TestHandler(tornado.web.RequestHandler):
 
     def post(self):
         pass
+
+
+if __name__ == '__main__':
+    from libs import validator
+    import inspect
+
+    for attr in dir(validator):
+        if inspect.isfunction(getattr(validator, attr)):
+            print attr
+

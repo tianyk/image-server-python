@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import copy
+import inspect
 
 try:
     from cStringIO import StringIO
@@ -86,26 +87,22 @@ def parse_qs(query):
     return encoded
 
 
-def check_param(request, getter):
-    def error_handler(msg):
-        print "error", msg
-
+def check_param(self, getter):
     def check_handler(param, fail_msg):
-        """
-
-        :param param:
-        :param fail_msg:
-        :return:
-        """
         value = getter(param)
-        print "value", value
         methods = {}
+
+        def error_handler(msg):
+            error = {"param": param, "msg": msg, "value": value}
+            if not self._validationErrors:
+                self._validationErrors = []
+            self._validationErrors.append(error)
 
         def method_handler(method_name, *args):
             def invoke_method(*args):
                 func = getattr(validator, method_name)
                 is_correct = func(value, *args)
-                print "is_correct", is_correct
+
                 if not is_correct:
                     error_handler(fail_msg or "Invalid value")
 
@@ -114,7 +111,10 @@ def check_param(request, getter):
 
             return invoke_method
 
-        methods["equals"] = method_handler("equals")
+        for attr in dir(validator):
+            if inspect.isfunction(getattr(validator, attr)):
+                methods[attr] = method_handler(attr)
+
         return methods
 
     return check_handler
@@ -132,7 +132,29 @@ class BaseImageHandler(tornado.web.RequestHandler):
             merge_dict(request.arguments, params)
             request.query_arguments = copy.deepcopy(request.arguments)
 
-        self.check = check_param(self.request, self.get_argument)
+        self._validationErrors = []
+
+        def get_args(param):
+            # values = self.get_arguments(param, None)
+            values = self.get_arguments(param, "")
+            if not values:
+                return
+            if len(values) == 0:
+                return values[0]
+            else:
+                return values
+
+        self.check = check_param(self, get_args)
+
+    def validation_errors(self, mapped=False):
+        if len(self._validationErrors) == 0:
+            return
+        if mapped:
+            errors = {}
+            for err in self._validationErrors:
+                errors[err["param"]] = err
+            return errors
+        return self._validationErrors
 
     def write_image(self, im, file_name, ext, interlace='0'):
         output = StringIO()
