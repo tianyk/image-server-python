@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from __future__ import division
 
 from PIL import Image, ExifTags
@@ -46,6 +47,16 @@ class ImageViewHandler(BaseImageHandler):
             self.write(info)
 
         elif IMAGE_VIEW == interface:  # 图片处理
+            self.check("w")["is_positive_int"]()
+            self.check("h")["is_positive_int"]()
+            self.check("format", "Unsupported format")["is_in"](["jpg", "jpeg", "gif", "png"])
+            self.check("interlace")["is_in"](["0", "1"])
+
+            errors = self.validation_errors()
+            if errors:
+                self.write_json(errors)
+                return
+
             mode = self.get_argument("mode", None)
             w = self.get_argument("w", None)
             h = self.get_argument("h", None)

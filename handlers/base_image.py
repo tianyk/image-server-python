@@ -9,6 +9,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 import datetime
+import json
 import tornado.web
 from PIL import ImageFile
 from libs import MIME, validator
@@ -88,7 +89,7 @@ def parse_qs(query):
 
 
 def check_param(self, getter):
-    def check_handler(param, fail_msg):
+    def check_handler(param, fail_msg="Invalid value"):
         value = getter(param)
         methods = {}
 
@@ -101,10 +102,13 @@ def check_param(self, getter):
         def method_handler(method_name, *args):
             def invoke_method(*args):
                 func = getattr(validator, method_name)
-                is_correct = func(value, *args)
+                if len(args) == 0:
+                    is_correct = func(value)
+                else:
+                    is_correct = func(value, *args)
 
                 if not is_correct:
-                    error_handler(fail_msg or "Invalid value")
+                    error_handler(fail_msg)
 
                 # 链式调用
                 return methods
@@ -135,11 +139,10 @@ class BaseImageHandler(tornado.web.RequestHandler):
         self._validationErrors = []
 
         def get_args(param):
-            # values = self.get_arguments(param, None)
-            values = self.get_arguments(param, "")
+            values = self.get_arguments(param, None)
             if not values:
                 return
-            if len(values) == 0:
+            if len(values) == 1:
                 return values[0]
             else:
                 return values
@@ -183,3 +186,11 @@ class BaseImageHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", "text/plain")
         self.set_header("Cache-Control", "no-store")
         self.write("This request URL " + self.request.path + " was not found on this server.")
+
+    def write_json(self, obj):
+        try:
+            res = json.dumps(obj)
+            self.set_header("Content-Type", "application/json; charset=UTF-8")
+            self.write(res)
+        except TypeError:
+            raise
