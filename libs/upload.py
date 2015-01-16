@@ -6,6 +6,7 @@ from bson import objectid
 
 UPLOAD_DIR = 'upload/'
 
+
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -16,7 +17,7 @@ def mkdir_p(path):
             raise
 
 
-def generate_filepath(filename):
+def generate_file_path(filename):
     file_id = objectid.ObjectId()
     ext = os.path.splitext(filename)[1]
     new_name = str(file_id) + ext
@@ -25,7 +26,8 @@ def generate_filepath(filename):
 
     return file_dir, new_name
 
-def get_filepath(filename, ext):
+
+def get_file_path(filename, ext):
     if not objectid.ObjectId.is_valid(filename):
         return
 

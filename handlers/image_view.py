@@ -21,7 +21,7 @@ UPLOAD_DIR = 'upload/'
 
 class ImageViewHandler(BaseImageHandler):
     def get(self, filename, ext):
-        filepath = upload.get_filepath(filename, ext)
+        filepath = upload.get_file_path(filename, ext)
         if not filepath:
             self.write_blank()
             return
