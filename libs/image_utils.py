@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
+from PIL import Image
+
 
 def image_view_mode_0(im, long_edge, short_edge):
     """
@@ -224,3 +226,50 @@ def image_view_mode_5(im, long_edge, short_edge):
 
     im = im.crop(tuple(box))
     return im
+
+
+def image_mogr_auto_orient(im):
+    """
+    根据原图EXIF信息自动旋正，便于后续处理建议放在首位。
+
+      1        2       3      4         5            6           7          8
+
+    888888  888888      88  88      8888888888  88                  88  8888888888
+    88          88      88  88      88  88      88  88          88  88      88  88
+    8888      8888    8888  8888    88          8888888888  8888888888          88
+    88          88      88  88
+    88          88  888888  888888
+    :param im:
+    """
+    exif = im._getexif()
+    if exif and exif.get(0x0112, None):
+        orientation = exif.get(0x0112, None)
+        if orientation == 1:
+            pass
+        elif orientation == 2:
+            im.transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 3:
+            im.transpose(Image.ROTATE_180)
+        elif orientation == 4:
+            im.transpose(Image.FLIP_TOP_BOTTOM)
+        elif orientation == 5:
+            im.transpose(Image.ROTATE_270).transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 6:
+            im.transpose(Image.ROTATE_270)
+        elif orientation == 7:
+            im.transpose(Image.ROTATE_90).transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 8:
+            im.transpose(Image.ROTATE_90)
+        else:
+            pass
+        # im['Exif.Image.Orientation'] = 1
+
+    return im
+
+
+def image_mogr_strip(im):
+    """
+    去除图片中的元信
+    :param im:
+    """
+    pass

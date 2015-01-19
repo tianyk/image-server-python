@@ -16,8 +16,6 @@ IMAGE_MOGR = "imageMogr"
 WATER_MARK = "watermark"
 IMAGE_AVE = "imageAve"
 
-UPLOAD_DIR = 'upload/'
-
 
 class ImageViewHandler(BaseImageHandler):
     def get(self, filename, ext):
@@ -104,8 +102,8 @@ class ImageViewHandler(BaseImageHandler):
             if exif:
                 # dict(zip(d.keys(), map(lambda x:x * 2, d.values())))
                 # dict((k, v*2) for k, v in {'a': 1, 'b': 2}.items())
-                exif = dict((ExifTags.TAGS.get(k, k), v) for k, v in exif.items())
-                self.write(exif)
+                exif = dict((ExifTags.TAGS.get(k, k), v) for k, v in exif.items() if k in ExifTags.TAGS)
+                self.write_json(exif)
             else:
                 self.write({"errcode": 400, "errmsg": "no exif info"})
             return
