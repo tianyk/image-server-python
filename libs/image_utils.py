@@ -3,7 +3,7 @@
 
 from __future__ import division
 import re
-from PIL import Image
+from PIL import Image, ImageFilter
 
 
 def image_view_mode_0(im, long_edge, short_edge):
@@ -480,3 +480,7 @@ def image_mogr_rotate(im, rotate_degree):
     if rotate_degree < 1 or rotate_degree > 360:
         return
     return im.rotate(rotate_degree)
+
+def image_mogr_blur(im):
+    # 高斯模糊
+    return im.filter(ImageFilter.BLUR)

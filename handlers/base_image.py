@@ -86,8 +86,9 @@ def parse_qs(query):
         encoded["interface"] = IMAGE_MOGR
         encoded["auto-orient"] = "auto-orient" in args
         encoded["strip"] = "strip" in args
+        encoded["blur"] = "blur" in args
 
-        args_name = ["thumbnail", "gravity", "crop", "rotate", "format", "blur", "interlace"]
+        args_name = ["thumbnail", "gravity", "crop", "rotate", "format", "interlace"]
         for arg_name in args_name:
             if arg_name in args:
                 try:

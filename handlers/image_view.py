@@ -138,6 +138,8 @@ class ImageViewHandler(BaseImageHandler):
                         im = image_utils.image_mogr_rotate(im, rotate)
                 elif "blur" == arg:
                     blur = self.get_argument("blur", None)
+                    if blur:
+                        im = image_utils.image_mogr_blur(im)
                 else:
                     pass
 
