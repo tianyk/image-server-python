@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
+import re
 from PIL import Image
 
 
@@ -239,6 +240,8 @@ def image_mogr_auto_orient(im):
     8888      8888    8888  8888    88          8888888888  8888888888          88
     88          88      88  88
     88          88  888888  888888
+
+    :rtype : Image
     :param im:
     """
     exif = im._getexif()
@@ -262,14 +265,218 @@ def image_mogr_auto_orient(im):
             im.transpose(Image.ROTATE_90)
         else:
             pass
-        # im['Exif.Image.Orientation'] = 1
+
+            # 重新修正Orientation值
+            # im['Orientation'] = 1
 
     return im
 
 
 def image_mogr_strip(im):
     """
-    去除图片中的元信
+    去除图片中的元信息
+    :rtype : Image
     :param im:
     """
-    pass
+    return im
+
+
+def image_mogr_thumbnail(im, image_size_geometry):
+    """
+    图像缩放
+    :rtype : Image
+    :param image_size_geometry:
+    :param im:
+    """
+    if re.match(r"^!([1-9][0-9]*)p$", image_size_geometry):
+        # /thumbnail/!<Scale>p
+        # 基于原图大小，按指定百分比缩放。取值范围0-1000。
+        scale = int(image_size_geometry[1:-1])
+        if scale >= 1000:
+            return
+        im = im.resize(tuple(int(x * scale / 100) for x in im.size))
+    elif re.match(r"^!([1-9][0-9]*)px$", image_size_geometry):
+        # /thumbnail/!<Scale>px
+        # 以百分比形式指定目标图片宽度，高度不变。取值范围0-1000。
+        scale = int(image_size_geometry[1:-2])
+        if scale >= 1000:
+            return
+        size = im.size
+        resize = (int(size[0] * scale / 100), size[1])
+        im = im.resize(resize)
+    elif re.match(r"^!x([1-9][0-9]*)p$", image_size_geometry):
+        # /thumbnail/!x<Scale>p
+        # 以百分比形式指定目标图片高度，宽度不变。取值范围0-1000。
+        scale = int(image_size_geometry[2:-1])
+        if scale >= 1000:
+            return
+        size = im.size
+        resize = (size[0], int(size[1] * scale / 100))
+        im = im.resize(resize)
+    elif re.match(r"^([1-9][0-9]*)x$", image_size_geometry):
+        # /thumbnail/<Width>x
+        # 指定目标图片宽度，高度等比缩放。取值范围0-10000。
+        width = int(image_size_geometry[:-1])
+        if width >= 10000:
+            return
+        size = im.size
+        ratio = width / size[0]
+        resize = (size[0], int(size[1] * ratio))
+        im = im.resize(resize)
+    elif re.match(r"^x([1-9][0-9]*)$", image_size_geometry):
+        # /thumbnail/x<Height>
+        # 指定目标图片高度，宽度等比缩放。取值范围0-10000。
+        height = int(image_size_geometry[1:])
+        if height >= 10000:
+            return
+        size = im.size
+        ratio = height / size[0]
+        resize = (int(size[0] * ratio), size[1])
+        im = im.resize(resize)
+    elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)$", image_size_geometry):
+        # /thumbnail/<Width>x<Height>
+        # 限定长边，短边自适应缩放，将目标图片限制在指定宽高矩形内。
+        # 取值范围不限，但若宽高超过10000只能缩不能放。
+        image_size_geometry = [int(x) for x in image_size_geometry.split("x")]
+        if min(image_size_geometry) > 10000:
+            return
+
+        size = im.size
+        long_edge = max(size)
+        short_edge = min(size)
+        if max(size) > 10000:
+            # 只能缩不能放
+            ratio_w = image_size_geometry[0] / long_edge
+            ratio_h = image_size_geometry[1] / short_edge
+            ratio = min(ratio_w, ratio_h)
+            if ratio >= 1:  # 只缩不放
+                return
+            else:
+                resize = tuple(int(x * ratio) for x in size)
+                im = im.resize(resize)
+        else:
+            ratio_w = image_size_geometry[0] / long_edge
+            ratio_h = image_size_geometry[1] / short_edge
+            ratio = min(ratio_w, ratio_h)
+            resize = tuple(int(x * ratio) for x in size)
+            if max(resize) > 10000:
+                return
+            im = im.resize(resize)
+    elif re.match(r"^!([1-9][0-9]*)x([1-9][0-9]*)r$", image_size_geometry):
+        # /thumbnail/!<Width>x<Height>r
+        # 限定短边，长边自适应缩放，目标图片会延伸至指定宽高矩形外。
+        # 取值范围不限，但若宽高超过10000只能缩不能放。
+        image_size_geometry = [int(x) for x in image_size_geometry[1:-1].split("x")]
+        if min(image_size_geometry) > 10000:
+            return
+
+        size = im.size
+        long_edge = max(size)
+        short_edge = min(size)
+        if max(size) > 10000:
+            # 只能缩不能放
+            ratio_w = image_size_geometry[0] / long_edge
+            ratio_h = image_size_geometry[1] / short_edge
+            ratio = max(ratio_w, ratio_h)
+            if ratio >= 1:  # 只缩不放
+                return
+            else:
+                resize = tuple(int(x * ratio) for x in size)
+                im = im.resize(resize)
+        else:
+            ratio_w = image_size_geometry[0] / long_edge
+            ratio_h = image_size_geometry[1] / short_edge
+            ratio = max(ratio_w, ratio_h)
+            resize = tuple(int(x * ratio) for x in size)
+            if max(resize) > 10000:
+                return
+            im = im.resize(resize)
+    elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)!$", image_size_geometry):
+        # /thumbnail/<Width>x<Height>!
+        # 限定目标图片宽高值，忽略原图宽高比例，按照指定宽高值强行缩略，可能导致目标图片变形。
+        # 取值范围不限，但若宽高超过10000只能缩不能放。
+        image_size_geometry = [int(x) for x in image_size_geometry[:-1].split("x")]
+        if min(image_size_geometry) >= 10000:
+            return
+        im = im.resize(tuple(image_size_geometry))
+    elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)>$", image_size_geometry):
+        # /thumbnail/<Width>x<Height>>
+        # 当原图尺寸大于给定的宽度或高度时，按照给定宽高值缩小。
+        # 取值范围不限，但若宽高超过10000只能缩不能放。
+        image_size_geometry = [int(x) for x in image_size_geometry[:-1].split("x")]
+        if min(image_size_geometry) >= 10000:
+            return
+
+        size = im.size
+        if size[0] < image_size_geometry[0] and size[1] < image_size_geometry[1]:
+            ratio_w = image_size_geometry[0] / size[0]
+            ratio_h = image_size_geometry[1] / size[1]
+            ratio = min(ratio_w, ratio_h)
+            resize = tuple(int(x * ratio) for x in size)
+            im = im.resize(resize)
+    elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)<$", image_size_geometry):
+        image_size_geometry = [int(x) for x in image_size_geometry[:-1].split("x")]
+        if min(image_size_geometry) >= 10000:
+            return
+
+        size = im.size
+        if size[0] > image_size_geometry[0] and size[1] > image_size_geometry[1]:
+            ratio_w = image_size_geometry[0] / size[0]
+            ratio_h = image_size_geometry[1] / size[1]
+            ratio = min(ratio_w, ratio_h)
+            resize = tuple(int(x * ratio) for x in size)
+            im = im.resize(resize)
+    elif re.match(r"^([1-9][0-9]*)@$", image_size_geometry):
+        area = int(image_size_geometry[:-1])
+        if area > 100000000:
+            return
+
+        size = im.size
+        origin_area = size[0] * size[1]
+        ratio = area / origin_area
+        resize = tuple(int(x * ratio) for x in size)
+        im = im.resize(resize)
+    else:
+        pass
+
+    return im
+
+
+def image_mogr_crop(im, image_size_and_offset_geometry):
+    if re.match(r"^([1-9](0-9)*)x$", image_size_and_offset_geometry):
+        width = int(image_size_and_offset_geometry[:-1])
+        if width >= 10000:
+            return
+
+        size = im.size
+        width = min(size[0], width)
+        im = im.crop((0, 0, width, size[1]))
+    elif re.match(r"^x([1-9][0-9]*)$", image_size_and_offset_geometry):
+        height = int(image_size_and_offset_geometry[1:])
+        if height >= 10000:
+            return
+
+        size = im.size
+        height = min(size[1], height)
+        im = im.crop((0, 0, size[0], height))
+    elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)$", image_size_and_offset_geometry):
+        image_size_and_offset_geometry = [int(x) for x in image_size_and_offset_geometry.split("x")]
+        if min(image_size_and_offset_geometry) >= 10000:
+            return
+
+        size = im.size
+        width = min(size[0], image_size_and_offset_geometry[0])
+        height = min(size[1], image_size_and_offset_geometry[1])
+
+        im = im.crop(0, 0, width, height)
+    else:
+        pass
+
+
+def image_mogr_rotate(im, rotate_degree):
+    # 旋转角度
+    # 取值范围1-360，缺省为不旋转。
+    rotate_degree = int(rotate_degree)
+    if rotate_degree < 1 or rotate_degree > 360:
+        return
+    return im.rotate(rotate_degree)

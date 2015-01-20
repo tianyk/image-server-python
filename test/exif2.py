@@ -1,0 +1,1 @@
+#!/usr/bin/env python# -*- coding: utf-8 -*-__author__ = 'tyk'from PIL import Imageim = Image.open("e:/P41116-164339.jpg")## exif = im._getexif()## print exif.get(0x0112, -1)# exif[0x0112] = 4## type(exif)## im.save("e:/new.jpg", 'JPEG', quality=50, exif={})im = im.copy()im.save("e:/new.jpg")print im.info

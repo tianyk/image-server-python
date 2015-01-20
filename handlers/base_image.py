@@ -31,6 +31,13 @@ IMAGE_FORMATS = {
 }
 
 
+def find_pox(arr, item):
+    for i, value in enumerate(arr):
+        if value == item:
+            return i
+    return
+
+
 def merge_dict(source, target):
     # keys = [key for key in source]
     keys = list(source)[:]
@@ -58,6 +65,7 @@ def parse_qs(query):
 
     encoded = {}
     args = query.split("/")
+
     interface = args[0]
     if IMAGE_INFO == interface:
         encoded["interface"] = IMAGE_INFO
@@ -76,6 +84,18 @@ def parse_qs(query):
 
     elif IMAGE_MOGR == interface:
         encoded["interface"] = IMAGE_MOGR
+        encoded["auto-orient"] = "auto-orient" in args
+        encoded["strip"] = "strip" in args
+
+        args_name = ["thumbnail", "gravity", "crop", "rotate", "format", "blur", "interlace"]
+        for arg_name in args_name:
+            if arg_name in args:
+                try:
+                    encoded[arg_name] = args[find_pox(args, arg_name) + 1]
+                except IndexError:
+                    pass
+                except TypeError:
+                    pass # NoneType
 
     elif WATER_MARK == interface:
         encoded["interface"] = WATER_MARK
@@ -130,7 +150,8 @@ class BaseImageHandler(tornado.web.RequestHandler):
     def __init__(self, application, request, **kwargs):
         super(BaseImageHandler, self).__init__(application, request, **kwargs)
 
-        uri = request.uri
+        self.uri = request.uri
+        self.query = request.query
         params = parse_qs(request.query)
         if params:
             merge_dict(request.arguments, params)

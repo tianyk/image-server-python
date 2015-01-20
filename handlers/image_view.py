@@ -108,7 +108,48 @@ class ImageViewHandler(BaseImageHandler):
                 self.write({"errcode": 400, "errmsg": "no exif info"})
             return
         elif IMAGE_MOGR == interface:
-            pass
+            self.check("NorthWest")["is_in"](["NorthWest", "North", "NorthEast",
+                                              "West", "Center", "East", "SouthWest", "South", "SouthEast"])
+
+            args = self.query.split("/")
+            # 保证顺序
+            for arg in args:
+                if "auto-orient" == arg:
+                    auto_orient = self.get_argument("auto-orient", None)
+                    if auto_orient:
+                        im = image_utils.image_mogr_auto_orient(im)
+                elif "strip" == arg:
+                    strip = self.get_argument("strip", None)
+                    if strip:
+                        im = image_utils.image_mogr_strip(im)
+                elif "thumbnail" == arg:
+                    thumbnail = self.get_argument("thumbnail", None)
+                    if thumbnail:
+                        im = image_utils.image_mogr_thumbnail(thumbnail)
+                elif "gravity" == arg:
+                    gravity = self.get_argument("gravity", None)
+                elif "crop" == arg:
+                    crop = self.get_argument("crop", None)
+                    if crop:
+                        im = image_utils.image_mogr_crop(im, crop)
+                elif "rotate" == arg:
+                    rotate = self.get_argument("rotate", None)
+                    if rotate:
+                        im = image_utils.image_mogr_rotate(im, rotate)
+                elif "blur" == arg:
+                    blur = self.get_argument("blur", None)
+                else:
+                    pass
+
+            format = self.get_argument("format", None)
+            interlace = self.get_argument("interlace", None)
+            if format:  # 首先校验format是否被支持
+                ext = format
+
+            if interlace:
+                self.write_image(im, filename, ext, interlace)
+            else:
+                self.write_image(im, filename, ext)
         elif WATER_MARK == interface:
             pass
         elif IMAGE_AVE == interface:
