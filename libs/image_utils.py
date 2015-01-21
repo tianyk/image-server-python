@@ -442,31 +442,74 @@ def image_mogr_thumbnail(im, image_size_geometry):
     return im
 
 
-def image_mogr_crop(im, image_size_and_offset_geometry):
-    if re.match(r"^([1-9](0-9)*)x$", image_size_and_offset_geometry):
-        width = int(image_size_and_offset_geometry[:-1])
+def _get_gravity_point(size, gravity):
+    point = [0, 0]
+    if "NorthWest" == gravity:
+        point[0] = 0
+        point[1] = 0
+    elif "North" == gravity:
+        point[0] = int(size[0] / 2)
+        point[1] = 0
+    elif "NorthEast" == gravity:
+        point[0] = size[0]
+        point[1] = 0
+    elif "West" == gravity:
+        point[0] = 0
+        point[1] = int(size[1] / 2)
+    elif "Center" == gravity:
+        point[0] = int(size[0] / 2)
+        point[1] = int(size[1] / 2)
+    elif "East" == gravity:
+        point[0] = size[0]
+        point[1] = int(size[1] / 2)
+    elif "SouthWest" == gravity:
+        point[0] = 0
+        point[1] = size[1]
+    elif "South" == gravity:
+        point[0] = int(size[0] / 2)
+        point[1] = size[1]
+    elif "SouthEast" == gravity:
+        point[0] = size[0]
+        point[1] = size[1]
+
+    return point
+
+def _fix_box(size, point, width, height):
+
+
+def image_mogr_crop(im, gravity, crop):
+    if re.match(r"^([1-9](0-9)*)x$", crop):
+        width = int(crop[:-1])
         if width >= 10000:
             return
 
         size = im.size
+        point = _get_gravity_point(size, gravity)
         width = min(size[0], width)
-        im = im.crop((0, 0, width, size[1]))
-    elif re.match(r"^x([1-9][0-9]*)$", image_size_and_offset_geometry):
-        height = int(image_size_and_offset_geometry[1:])
+        box = [int(point[0] - width / 2), 0, int(point[0] + width / 2), size[1]]
+
+        im = im.crop(tuple(box))
+        
+    elif re.match(r"^x([1-9][0-9]*)$", crop):
+        height = int(crop[1:])
         if height >= 10000:
             return
 
         size = im.size
+        point = _get_gravity_point(size, gravity)
         height = min(size[1], height)
+        box = [0, 0, size[0], size[1]]
+
+
         im = im.crop((0, 0, size[0], height))
-    elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)$", image_size_and_offset_geometry):
-        image_size_and_offset_geometry = [int(x) for x in image_size_and_offset_geometry.split("x")]
-        if min(image_size_and_offset_geometry) >= 10000:
+    elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)$", crop):
+        crop = [int(x) for x in crop.split("x")]
+        if min(crop) >= 10000:
             return
 
         size = im.size
-        width = min(size[0], image_size_and_offset_geometry[0])
-        height = min(size[1], image_size_and_offset_geometry[1])
+        width = min(size[0], crop[0])
+        height = min(size[1], crop[1])
 
         im = im.crop(0, 0, width, height)
     else:
