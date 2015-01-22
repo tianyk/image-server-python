@@ -125,8 +125,7 @@ class ImageViewHandler(BaseImageHandler):
                 elif "thumbnail" == arg:
                     thumbnail = self.get_argument("thumbnail", None)
                     if thumbnail:
-                        im = image_utils.image_mogr_thumbnail(thumbnail)
-                # elif "gravity" == arg:
+                        im = image_utils.image_mogr_thumbnail(im, thumbnail)
                 elif "crop" == arg:
                     gravity = self.get_argument("gravity", "NorthWest")
                     crop = self.get_argument("crop", None)

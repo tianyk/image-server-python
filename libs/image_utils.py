@@ -321,7 +321,7 @@ def image_mogr_thumbnail(im, image_size_geometry):
             return
         size = im.size
         ratio = width / size[0]
-        resize = (size[0], int(size[1] * ratio))
+        resize = (width, int(size[1] * ratio))
         im = im.resize(resize)
     elif re.match(r"^x([1-9][0-9]*)$", image_size_geometry):
         # /thumbnail/x<Height>
@@ -330,8 +330,8 @@ def image_mogr_thumbnail(im, image_size_geometry):
         if height >= 10000:
             return
         size = im.size
-        ratio = height / size[0]
-        resize = (int(size[0] * ratio), size[1])
+        ratio = height / size[1]
+        resize = (int(size[0] * ratio), height)
         im = im.resize(resize)
     elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)$", image_size_geometry):
         # /thumbnail/<Width>x<Height>
@@ -400,6 +400,7 @@ def image_mogr_thumbnail(im, image_size_geometry):
             return
         im = im.resize(tuple(image_size_geometry))
     elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)>$", image_size_geometry):
+        # fix
         # /thumbnail/<Width>x<Height>>
         # 当原图尺寸大于给定的宽度或高度时，按照给定宽高值缩小。
         # 取值范围不限，但若宽高超过10000只能缩不能放。
@@ -415,6 +416,7 @@ def image_mogr_thumbnail(im, image_size_geometry):
             resize = tuple(int(x * ratio) for x in size)
             im = im.resize(resize)
     elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)<$", image_size_geometry):
+        # fix
         image_size_geometry = [int(x) for x in image_size_geometry[:-1].split("x")]
         if min(image_size_geometry) >= 10000:
             return
@@ -427,6 +429,7 @@ def image_mogr_thumbnail(im, image_size_geometry):
             resize = tuple(int(x * ratio) for x in size)
             im = im.resize(resize)
     elif re.match(r"^([1-9][0-9]*)@$", image_size_geometry):
+        # fix
         area = int(image_size_geometry[:-1])
         if area > 100000000:
             return
@@ -436,8 +439,6 @@ def image_mogr_thumbnail(im, image_size_geometry):
         ratio = area / origin_area
         resize = tuple(int(x * ratio) for x in size)
         im = im.resize(resize)
-    else:
-        pass
 
     return im
 
@@ -474,46 +475,114 @@ def _get_gravity_point(size, gravity):
 
     return point
 
-def _fix_box(size, point, width, height):
+
+def get_box(size, point, width, height):
+    """
+
+    :param size: 数组size[0]底层背景的宽，size[1]底层背景的高
+    :param point: 中心圆点坐标，左上角为0,0，右下角为size[0],size[1]
+    :param width: 绿色图层的宽
+    :param height: 绿色图层的高
+    :return:
+    """
+    width = min(size[0], width)
+    height = min(size[1], height)
+    box = [int(point[0] - width / 2), int(point[1] - height / 2), int(point[0] + width / 2), int(point[1] + height / 2)]
+    if box[0] < 0:
+        box[2] -= box[0]
+        box[0] = 0
+    if box[1] < 0:
+        box[3] -= box[1]
+        box[1] = 0
+
+    # 因为width和height永远小于等于外层box的宽和高，上下两种情况不会同时出现
+    # box[0] < 0 和 box[2] > size[0]不会同时存在
+    if box[2] > size[0]:
+        box[0] -= (box[2] - size[0])
+        box[2] = size[0]
+    if box[3] > size[1]:
+        box[1] -= (box[3] - size[1])
+        box[3] = size[1]
+
+    return tuple(box)
 
 
 def image_mogr_crop(im, gravity, crop):
-    if re.match(r"^([1-9](0-9)*)x$", crop):
+    """
+    图片裁剪
+    """
+    size = im.size
+    point = _get_gravity_point(size, gravity)
+
+    if re.match(r"^([1-9][0-9]*)x$", crop):
         width = int(crop[:-1])
         if width >= 10000:
             return
 
-        size = im.size
-        point = _get_gravity_point(size, gravity)
-        width = min(size[0], width)
-        box = [int(point[0] - width / 2), 0, int(point[0] + width / 2), size[1]]
-
+        box = get_box(size, point, width, size[1])
         im = im.crop(tuple(box))
-        
+
     elif re.match(r"^x([1-9][0-9]*)$", crop):
         height = int(crop[1:])
         if height >= 10000:
             return
 
-        size = im.size
-        point = _get_gravity_point(size, gravity)
-        height = min(size[1], height)
-        box = [0, 0, size[0], size[1]]
+        box = get_box(size, point, size[0], height)
+        im = im.crop(box)
 
-
-        im = im.crop((0, 0, size[0], height))
     elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)$", crop):
         crop = [int(x) for x in crop.split("x")]
         if min(crop) >= 10000:
             return
 
-        size = im.size
-        width = min(size[0], crop[0])
-        height = min(size[1], crop[1])
+        box = get_box(size, point, crop[0], crop[1])
+        im = im.crop(box)
 
-        im = im.crop(0, 0, width, height)
-    else:
-        pass
+    elif re.match(r"^!([1-9][0-9]*)x([1-9][0-9]*)a([1-9][0-9]*)a([1-9][0-9]*)$", crop):
+        # /crop/!{cropSize}a<dx>a<dy>
+        # 相对于偏移锚点，向右偏移dx个像素，同时向下偏移dy个像素。
+        crop = [int(x) for x in re.findall(r"[1-9][0-9]*", crop)]
+        if min(crop[:2]) >= 10000:
+            return
+
+        point[0] += crop[2]
+        point[1] += crop[3]
+        box = get_box(size, point, crop[0], crop[1])
+        im = im.crop(box)
+
+    elif re.match(r"^!([1-9][0-9]*)x([1-9][0-9]*)-([1-9][0-9]*)a([1-9][0-9]*)$", crop):
+        # /crop/!{cropSize}-<dx>a<dy>
+        # 相对于偏移锚点，向下偏移dy个像素，同时从指定宽度中减去dx个像素。
+        crop = [int(x) for x in re.findall(r"[1-9][0-9]*", crop)]
+        if min(crop[:2]) >= 10000:
+            return
+
+        point[1] += crop[3]
+        box = get_box(size, point, crop[0] - crop[2], crop[1])
+        im = im.crop(box)
+
+    elif re.match(r"^!([1-9][0-9]*)x([1-9][0-9]*)a([1-9][0-9]*)-([1-9][0-9]*)$", crop):
+        # /crop/!{cropSize}a<dx>-<dy>
+        # 相对于偏移锚点，向右偏移dx个像素，同时从指定高度中减去dy个像素。
+        crop = [int(x) for x in re.findall(r"[1-9][0-9]*", crop)]
+        if min(crop[:2]) >= 10000:
+            return
+
+        point[0] += crop[2]
+        box = get_box(size, point, crop[0], crop[1] - crop[3])
+        im = im.crop(box)
+
+    elif re.match(r"^!([1-9][0-9]*)x([1-9][0-9]*)-([1-9][0-9]*)-([1-9][0-9]*)$", crop):
+        # /crop/!{cropSize}-<dx>-<dy>
+        # 相对于偏移锚点，从指定宽度中减去dx个像素，同时从指定高度中减去dy个像素。
+        crop = [int(x) for x in re.findall(r"[1-9][0-9]*", crop)]
+        if min(crop[:2]) >= 10000:
+            return
+
+        box = get_box(size, point, crop[0] - crop[2], crop[1] - crop[3])
+        im = im.crop[box]
+
+    return im
 
 
 def image_mogr_rotate(im, rotate_degree):
@@ -523,6 +592,7 @@ def image_mogr_rotate(im, rotate_degree):
     if rotate_degree < 1 or rotate_degree > 360:
         return
     return im.rotate(rotate_degree)
+
 
 def image_mogr_blur(im):
     # 高斯模糊
