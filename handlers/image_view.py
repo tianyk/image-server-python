@@ -18,13 +18,13 @@ IMAGE_AVE = "imageAve"
 
 class ImageViewHandler(BaseImageHandler):
     def get(self, filename, ext):
-        filepath = upload.get_file_path(filename, ext)
-        if not filepath:
+        file_path = upload.get_file_path(filename, ext)
+        if not file_path:
             self.write_blank()
             return
 
         try:
-            im = Image.open(filepath)
+            im = Image.open(file_path)
         except IOError:
             self.write_blank()
             return
