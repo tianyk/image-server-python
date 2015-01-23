@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
-
+import urllib
 from PIL import Image, ExifTags
-
 from base_image import BaseImageHandler
 from libs import image_utils, upload
 
@@ -125,7 +124,7 @@ class ImageViewHandler(BaseImageHandler):
                 elif "thumbnail" == arg:
                     thumbnail = self.get_argument("thumbnail", None)
                     if thumbnail:
-                        im = image_utils.image_mogr_thumbnail(im, thumbnail)
+                        im = image_utils.image_mogr_thumbnail(im, urllib.unquote(thumbnail))
                 elif "crop" == arg:
                     gravity = self.get_argument("gravity", "NorthWest")
                     crop = self.get_argument("crop", None)

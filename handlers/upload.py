@@ -32,7 +32,7 @@ class UploadHandler(BaseImageHandler):
 
                 # for file in files['files']:
                 # content_type = file["content_type"]
-                #     if content_type.startswith("image/"):
+                # if content_type.startswith("image/"):
                 #         file_path = upload.generate_file_path(file["filename"])
                 #         with open("/".join(file_path), "wb") as f:
                 #             f.write(file["body"])
