@@ -116,11 +116,11 @@ class ImageViewHandler(BaseImageHandler):
             for arg in args:
                 if "auto-orient" == arg:
                     auto_orient = self.get_argument("auto-orient", None)
-                    if auto_orient:
+                    if auto_orient == "True":
                         im = image_utils.image_mogr_auto_orient(im)
                 elif "strip" == arg:
                     strip = self.get_argument("strip", None)
-                    if strip:
+                    if strip == "True":
                         im = image_utils.image_mogr_strip(im)
                 elif "thumbnail" == arg:
                     thumbnail = self.get_argument("thumbnail", None)
@@ -137,7 +137,7 @@ class ImageViewHandler(BaseImageHandler):
                         im = image_utils.image_mogr_rotate(im, rotate)
                 elif "blur" == arg:
                     blur = self.get_argument("blur", None)
-                    if blur:
+                    if blur == "True":
                         im = image_utils.image_mogr_blur(im)
                 else:
                     pass

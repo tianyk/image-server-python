@@ -84,9 +84,9 @@ def parse_qs(query):
 
     elif IMAGE_MOGR == interface:
         encoded["interface"] = IMAGE_MOGR
-        encoded["auto-orient"] = "auto-orient" in args
-        encoded["strip"] = "strip" in args
-        encoded["blur"] = "blur" in args
+        encoded["auto-orient"] = str("auto-orient" in args)
+        encoded["strip"] = str("strip" in args)
+        encoded["blur"] = str("blur" in args)
 
         args_name = ["thumbnail", "gravity", "crop", "rotate", "format", "interlace"]
         for arg_name in args_name:
@@ -96,7 +96,7 @@ def parse_qs(query):
                 except IndexError:
                     pass
                 except TypeError:
-                    pass # NoneType
+                    pass  # NoneType
 
     elif WATER_MARK == interface:
         encoded["interface"] = WATER_MARK

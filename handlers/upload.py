@@ -30,18 +30,18 @@ class UploadHandler(BaseImageHandler):
             else:
                 self.write('Unsupported format')
 
-            # for file in files['files']:
-            #     content_type = file["content_type"]
-            #     if content_type.startswith("image/"):
-            #         file_path = upload.generate_file_path(file["filename"])
-            #         with open("/".join(file_path), "wb") as f:
-            #             f.write(file["body"])
-            #
-            #         self.write_json({"file_path": file_path[1]})
-            #     else:
-            #         self.write('Unsupported format')
-            # if persistentOps:
-            #     pass
+                # for file in files['files']:
+                # content_type = file["content_type"]
+                #     if content_type.startswith("image/"):
+                #         file_path = upload.generate_file_path(file["filename"])
+                #         with open("/".join(file_path), "wb") as f:
+                #             f.write(file["body"])
+                #
+                #         self.write_json({"file_path": file_path[1]})
+                #     else:
+                #         self.write('Unsupported format')
+                # if persistentOps:
+                #     pass
         else:
             self.write('no file.')
 

@@ -476,19 +476,23 @@ def _get_gravity_point(size, gravity):
     return point
 
 
-def get_box(size, point, width, height):
+def get_box(size, point, width, height, dx=0, dy=0):
     """
+    先趋于中心，后偏移。但是始终在原图范围内
 
     :param size: 数组size[0]底层背景的宽，size[1]底层背景的高
     :param point: 中心圆点坐标，左上角为0,0，右下角为size[0],size[1]
     :param width: 绿色图层的宽
     :param height: 绿色图层的高
+    :param dx: 向右偏移量
+    :param dy: 向下偏移量
     :return:
     """
     width = min(size[0], width)
     height = min(size[1], height)
     box = [int(point[0] - width / 2), int(point[1] - height / 2), int(point[0] + width / 2), int(point[1] + height / 2)]
     if box[0] < 0:
+        # 先给box[2]赋值，它依赖于box[0]
         box[2] -= box[0]
         box[0] = 0
     if box[1] < 0:
@@ -503,6 +507,13 @@ def get_box(size, point, width, height):
     if box[3] > size[1]:
         box[1] -= (box[3] - size[1])
         box[3] = size[1]
+
+    if box[2] + dx > size[0]:
+        box[0] += (size[0] - box[2])
+        box[2] = size[0]
+    if box[3] + dy > size[1]:
+        box[1] += (size[1] - box[3])
+        box[1] = size[1]
 
     return tuple(box)
 
@@ -520,7 +531,7 @@ def image_mogr_crop(im, gravity, crop):
             return
 
         box = get_box(size, point, width, size[1])
-        im = im.crop(tuple(box))
+        im = im.crop(box)
 
     elif re.match(r"^x([1-9][0-9]*)$", crop):
         height = int(crop[1:])
@@ -545,9 +556,10 @@ def image_mogr_crop(im, gravity, crop):
         if min(crop[:2]) >= 10000:
             return
 
-        point[0] += crop[2]
-        point[1] += crop[3]
-        box = get_box(size, point, crop[0], crop[1])
+        # point[0] += crop[2]
+        # point[1] += crop[3]
+        box = get_box(size, point, crop[0], crop[1], crop[2], crop[3])
+
         im = im.crop(box)
 
     elif re.match(r"^!([1-9][0-9]*)x([1-9][0-9]*)-([1-9][0-9]*)a([1-9][0-9]*)$", crop):
@@ -557,8 +569,8 @@ def image_mogr_crop(im, gravity, crop):
         if min(crop[:2]) >= 10000:
             return
 
-        point[1] += crop[3]
-        box = get_box(size, point, crop[0] - crop[2], crop[1])
+        # point[1] += crop[3]
+        box = get_box(size, point, crop[0] - crop[2], crop[1], dy=crop[3])
         im = im.crop(box)
 
     elif re.match(r"^!([1-9][0-9]*)x([1-9][0-9]*)a([1-9][0-9]*)-([1-9][0-9]*)$", crop):
@@ -568,8 +580,8 @@ def image_mogr_crop(im, gravity, crop):
         if min(crop[:2]) >= 10000:
             return
 
-        point[0] += crop[2]
-        box = get_box(size, point, crop[0], crop[1] - crop[3])
+        # point[0] += crop[2]
+        box = get_box(size, point, crop[0], crop[1] - crop[3], dx=crop[2])
         im = im.crop(box)
 
     elif re.match(r"^!([1-9][0-9]*)x([1-9][0-9]*)-([1-9][0-9]*)-([1-9][0-9]*)$", crop):
@@ -580,7 +592,7 @@ def image_mogr_crop(im, gravity, crop):
             return
 
         box = get_box(size, point, crop[0] - crop[2], crop[1] - crop[3])
-        im = im.crop[box]
+        im = im.crop(box)
 
     return im
 

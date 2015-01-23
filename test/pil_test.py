@@ -47,7 +47,7 @@ from PIL import Image
 # draw = ImageDraw.Draw(mask)
 # for i in range(5, 100, 10):
 # draw.line((i, 0, i, 100), fill=random.randrange(256))
-#     draw.line((0, i, 100, i), fill=random.randrange(256))
+# draw.line((0, i, 100, i), fill=random.randrange(256))
 # # mask.show()
 # result = Image.composite(background, foreground, mask)
 # # result.show()
