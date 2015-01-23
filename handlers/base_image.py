@@ -100,7 +100,9 @@ def parse_qs(query):
 
     elif WATER_MARK == interface:
         encoded["interface"] = WATER_MARK
-
+        encoded["mode"] = args[1]
+        params = dict(zip(*2 * (iter(args[2:]),)))
+        merge_dict(encoded, params)
     elif IMAGE_AVE == interface:
         encoded["interface"] = IMAGE_AVE
 

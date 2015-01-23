@@ -3,7 +3,8 @@
 
 from __future__ import division
 import re
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageColor, ImageFont, ImageDraw
+from libs import fonts
 
 
 def image_view_mode_0(im, long_edge, short_edge):
@@ -609,3 +610,45 @@ def image_mogr_rotate(im, rotate_degree):
 def image_mogr_blur(im):
     # 高斯模糊
     return im.filter(ImageFilter.BLUR)
+
+
+def _re_point(size, point, fontsize, dx=0, dy=0):
+    """
+    :param size:
+    :param point:
+    :param dx: 横轴边距
+    :param dy: 纵轴边距
+    :return:
+    """
+    if point[0] - dx < 0:
+        point[0] += dx
+    else:
+        point[0] -= (fontsize[0] + dx)
+
+    if point[1] - dy < 0:
+        point[1] += dy
+    else:
+        point[1] -= (fontsize[1] + dy)
+
+    return tuple(point)
+
+
+def image_water_mark_text(im, text, font="黑体", fontsize=0, fill="white", dissolve=100,
+                          gravity="SouthEast", dx=10, dy=10):
+    try:
+        font = ImageFont.truetype(fonts.fonts[font], int(fontsize))
+    except IOError:
+        raise
+
+
+    try:
+        fill = ImageColor.getrgb(fill)
+    except ValueError:
+        raise
+
+    size = im.size
+    point = _get_gravity_point(size, gravity)
+    re_point = _re_point(size, point, font.getsize(text), dx, dy)
+    draw = ImageDraw.Draw(im)
+    draw.text(point, text, fill=fill, font=font)
+    return im

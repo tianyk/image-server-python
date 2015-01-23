@@ -3,9 +3,10 @@
 
 from __future__ import division
 import urllib
+import base64
 from PIL import Image, ExifTags
 from base_image import BaseImageHandler
-from libs import image_utils, upload
+from libs import image_utils, upload, fonts
 
 
 IMAGE_INFO = "imageInfo"
@@ -150,8 +151,38 @@ class ImageViewHandler(BaseImageHandler):
                 self.write_image(im, filename, ext, interlace)
             else:
                 self.write_image(im, filename, ext)
+
         elif WATER_MARK == interface:
-            pass
+            mode = self.get_argument("mode", None)
+
+            size = im.size
+            if "1" == mode:
+                pass
+            elif "2" == mode:
+                self.check("text")["not_empty"]()
+                self.check("font")["is_in"](fonts.fonts.keys())
+                self.check("format", "Unsupported format")["is_in"](["jpg", "jpeg", "gif", "png"])
+                self.check("interlace")["is_in"](["0", "1"])
+
+                errors = self.validation_errors()
+                if errors:
+                    self.write_json(errors)
+                    return
+
+                # 文字水印
+                text = self.get_argument("text", None)
+                font = self.get_argument("font", "黑体")
+                fontsize = self.get_argument("fontsize", "0")
+                fill = self.get_argument("fill", "white")
+                dissolve = self.get_argument("dissolve", "100")
+                gravity = self.get_argument("gravity", "SouthEast")
+                dx = self.get_argument("dx", "10")
+                dy = self.get_argument("dy", "10")
+
+                im = image_utils.image_water_mark_text(im, base64.b64decode(text), font=font, fontsize=int(fontsize),
+                                                       fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
+
+                self.write_image(im, filename, ext)
         elif IMAGE_AVE == interface:
             pass
         else:  # 直接返回原图
