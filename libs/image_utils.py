@@ -640,7 +640,6 @@ def image_water_mark_text(im, text, font="黑体", fontsize=0, fill="white", dis
     except IOError:
         raise
 
-
     try:
         fill = ImageColor.getrgb(fill)
     except ValueError:

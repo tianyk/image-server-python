@@ -3,6 +3,7 @@
 
 import copy
 import inspect
+import urllib
 
 try:
     from cStringIO import StringIO
@@ -172,6 +173,28 @@ class BaseImageHandler(tornado.web.RequestHandler):
                 return values
 
         self.check = check_param(self, get_args)
+
+    _ARG_DEFAULT = []
+
+    def get_arguments(self, name, strip=True, unquote=True):
+        args = super(BaseImageHandler, self).get_arguments(name, strip=strip)
+        if args and unquote:
+            if isinstance(args, list):
+                args = [urllib.unquote(x) for x in args]
+            elif isinstance(args, str):
+                args = urllib.unquote(args)
+
+        return args
+
+    def get_argument(self, name, default=_ARG_DEFAULT, strip=True, unquote=True):
+        args = super(BaseImageHandler, self).get_argument(name, default=default, strip=strip)
+        if args and unquote:
+            if isinstance(args, list):
+                args = [urllib.unquote(x) for x in args]
+            elif isinstance(args, unicode):
+                args = urllib.unquote(args)
+
+        return args
 
     def validation_errors(self, mapped=False):
         if len(self._validationErrors) == 0:

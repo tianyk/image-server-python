@@ -160,9 +160,11 @@ class ImageViewHandler(BaseImageHandler):
                 pass
             elif "2" == mode:
                 self.check("text")["not_empty"]()
-                self.check("font")["is_in"](fonts.fonts.keys())
+                # self.check("font")["is_in"](fonts.fonts.keys())
                 self.check("format", "Unsupported format")["is_in"](["jpg", "jpeg", "gif", "png"])
                 self.check("interlace")["is_in"](["0", "1"])
+                self.check("dx")["is_positive_int"]()
+                self.check("dy")["is_positive_int"]()
 
                 errors = self.validation_errors()
                 if errors:
@@ -178,6 +180,8 @@ class ImageViewHandler(BaseImageHandler):
                 gravity = self.get_argument("gravity", "SouthEast")
                 dx = self.get_argument("dx", "10")
                 dy = self.get_argument("dy", "10")
+
+                print font
 
                 im = image_utils.image_water_mark_text(im, base64.b64decode(text), font=font, fontsize=int(fontsize),
                                                        fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
