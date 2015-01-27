@@ -649,5 +649,5 @@ def image_water_mark_text(im, text, font="黑体", fontsize=0, fill="white", dis
     point = _get_gravity_point(size, gravity)
     re_point = _re_point(size, point, font.getsize(text), dx, dy)
     draw = ImageDraw.Draw(im)
-    draw.text(point, text, fill=fill, font=font)
+    draw.text(point, text.decode('utf-8'), fill=fill, font=font)
     return im

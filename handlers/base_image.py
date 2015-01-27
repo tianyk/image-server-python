@@ -180,9 +180,9 @@ class BaseImageHandler(tornado.web.RequestHandler):
         args = super(BaseImageHandler, self).get_arguments(name, strip=strip)
         if args and unquote:
             if isinstance(args, list):
-                args = [urllib.unquote(x) for x in args]
-            elif isinstance(args, str):
-                args = urllib.unquote(args)
+                args = [urllib.unquote(x.encode('utf-8')) for x in args]
+            elif isinstance(args, unicode):
+                args = urllib.unquote(args.encode('utf-8'))
 
         return args
 
@@ -192,7 +192,7 @@ class BaseImageHandler(tornado.web.RequestHandler):
             if isinstance(args, list):
                 args = [urllib.unquote(x) for x in args]
             elif isinstance(args, unicode):
-                args = urllib.unquote(args)
+                args = urllib.unquote(args.encode('utf-8'))
 
         return args
 
