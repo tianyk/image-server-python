@@ -614,8 +614,10 @@ def image_mogr_blur(im):
 
 def _re_point(size, point, fontsize, dx=0, dy=0):
     """
+
     :param size:
     :param point:
+    :param fontsize: 文字占用空间大小
     :param dx: 横轴边距
     :param dy: 纵轴边距
     :return:

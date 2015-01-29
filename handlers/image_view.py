@@ -173,19 +173,33 @@ class ImageViewHandler(BaseImageHandler):
 
                 # 文字水印
                 text = self.get_argument("text", None)
-                font = self.get_argument("font", "黑体")
+                font = self.get_argument("font", base64.urlsafe_b64encode("黑体"))
                 fontsize = self.get_argument("fontsize", "0")
-                fill = self.get_argument("fill", "white")
+                fill = self.get_argument("fill", base64.urlsafe_b64encode("white"))
                 dissolve = self.get_argument("dissolve", "100")
                 gravity = self.get_argument("gravity", "SouthEast")
                 dx = self.get_argument("dx", "10")
                 dy = self.get_argument("dy", "10")
 
-                # im = image_utils.image_water_mark_text(im, base64.b64decode(text), font=font, fontsize=int(fontsize),
-                #                                        fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
+                # @see http://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
+                # lens = len(strg)
+                # lenx = lens - (lens % 4 if lens % 4 else 4)
+                # try:
+                #     result = base64.decodestring(strg[:lenx])
+                # except etc
+
+                try:
+                    text = base64.urlsafe_b64decode(text)
+                    font = base64.urlsafe_b64decode(font)
+                    fill = base64.urlsafe_b64decode(fill)
+                except TypeError:
+                    raise
 
                 im = image_utils.image_water_mark_text(im, text, font=font, fontsize=int(fontsize),
                                                        fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
+
+                # im = image_utils.image_water_mark_text(im, text, font=font, fontsize=int(fontsize),
+                #                                        fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
                 self.write_image(im, filename, ext)
         elif IMAGE_AVE == interface:
             pass

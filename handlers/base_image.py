@@ -100,6 +100,8 @@ def parse_qs(query):
                     pass  # NoneType
 
     elif WATER_MARK == interface:
+        if len(args) <= 2:
+            return
         encoded["interface"] = WATER_MARK
         encoded["mode"] = args[1]
         params = dict(zip(*2 * (iter(args[2:]),)))
