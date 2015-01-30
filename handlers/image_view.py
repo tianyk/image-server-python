@@ -86,8 +86,6 @@ class ImageViewHandler(BaseImageHandler):
                 re_im = image_utils.image_view_mode_5(im, w, h)
                 if re_im:
                     im = re_im
-            else:
-                pass
 
             if format:  # 首先校验format是否被支持
                 ext = format
@@ -116,11 +114,11 @@ class ImageViewHandler(BaseImageHandler):
             for arg in args:
                 if "auto-orient" == arg:
                     auto_orient = self.get_argument("auto-orient", None)
-                    if auto_orient == "True":
+                    if "True" == auto_orient:
                         im = image_utils.image_mogr_auto_orient(im)
                 elif "strip" == arg:
                     strip = self.get_argument("strip", None)
-                    if strip == "True":
+                    if "True" == strip:
                         im = image_utils.image_mogr_strip(im)
                 elif "thumbnail" == arg:
                     thumbnail = self.get_argument("thumbnail", None)
@@ -137,10 +135,8 @@ class ImageViewHandler(BaseImageHandler):
                         im = image_utils.image_mogr_rotate(im, rotate)
                 elif "blur" == arg:
                     blur = self.get_argument("blur", None)
-                    if blur == "True":
+                    if "True" == blur:
                         im = image_utils.image_mogr_blur(im)
-                else:
-                    pass
 
             format = self.get_argument("format", None)
             interlace = self.get_argument("interlace", None)
