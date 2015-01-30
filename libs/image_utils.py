@@ -653,3 +653,19 @@ def image_water_mark_text(im, text, font="黑体", fontsize=0, fill="white", dis
     draw = ImageDraw.Draw(im)
     draw.text(point, text.decode('utf-8'), fill=fill, font=font)
     return im
+
+
+def image_water_mark_image(im, mark_im, dissolve=100, gravity="SouthEast", dx=10, dy=10):
+    size = im.size
+    mark_im_size = mark_im.size
+
+    if mark_im_size[0] + dx > size[0] or mark_im_size[1] + dy > size[1]:
+        # TODO 水印图片不能大于原图
+        return
+
+    point = _get_gravity_point(size, gravity)
+    re_point = _re_point(size, point, mark_im_size, dx, dy)
+
+    # @see http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil/9459208#9459208
+    im.paste(mark_im_size, re_point, mask=mark_im_size.split()[3])
+    return im

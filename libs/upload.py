@@ -18,8 +18,8 @@ def mkdir_p(path):
 
 
 def generate_file_path(filename):
-    file_id = objectid.ObjectId()
     ext = os.path.splitext(filename)[1]
+    file_id = objectid.ObjectId()
     new_name = str(file_id) + ext
     file_dir = UPLOAD_DIR + file_id.generation_time.strftime("%Y%m%d")
     mkdir_p(file_dir)

@@ -6,9 +6,9 @@ import urllib
 import base64
 from PIL import Image, ExifTags
 from base_image import BaseImageHandler
-from libs import image_utils, upload, fonts
+from libs import image_utils, upload, download, fonts
 
-
+TEMP_DIR = "temp/"
 IMAGE_INFO = "imageInfo"
 IMAGE_VIEW = "imageView"
 EXIF = "exif"
@@ -153,12 +153,43 @@ class ImageViewHandler(BaseImageHandler):
 
             size = im.size
             if "1" == mode:
-                pass
+                self.check("image")["not_empty"]()["is_base64"]()
+                self.check("dx")["is_positive_int"]()
+                self.check("dy")["is_positive_int"]()
+
+                errors = self.validation_errors()
+                if errors:
+                    self.write_json(errors)
+                    return
+
+                # 图片水印
+                image = self.get_argument("image", None)
+                dissolve = self.get_argument("dissolve", "100")
+                gravity = self.get_argument("gravity", "SouthEast")
+                dx = self.get_argument("dx", "10")
+                dy = self.get_argument("dy", "10")
+
+                image = base64.urlsafe_b64decode(image)
+
+                image_name = download.download_image(image)
+                if not image_name:
+                    # TODO
+                    return
+                else:
+                    image_path = path = TEMP_DIR + "/" + str(image_name)
+                    mark_im = Image.open(image_path)
+                    verified = mark_im.verify()
+                    if verified:
+                        image_utils.image_water_mark_image()
+                    else:
+                        pass
+
+
             elif "2" == mode:
-                self.check("text")["not_empty"]()["is_url_salf_base64"]()
-                self.check("font")["is_in"](fonts.fonts.keys())["is_url_salf_base64"]()
+                self.check("text")["not_empty"]()["is_base64"]()
+                self.check("font")["is_in"](fonts.fonts.keys())["is_base64"]()
                 self.check("format", "Unsupported format")["is_in"](["jpg", "jpeg", "gif", "png"])
-                self.check("fill")["is_url_salf_base64"]()
+                self.check("fill")["is_base64"]()
                 self.check("interlace")["is_in"](["0", "1"])
                 self.check("dx")["is_positive_int"]()
                 self.check("dy")["is_positive_int"]()

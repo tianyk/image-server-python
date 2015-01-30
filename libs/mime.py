@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# @see https://github.com/rack/rack/blob/master/lib/rack/mime.rb#L54
+
 MIME = {
     "css": "text/css",
     "gif": "image/gif",
