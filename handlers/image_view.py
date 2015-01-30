@@ -155,9 +155,10 @@ class ImageViewHandler(BaseImageHandler):
             if "1" == mode:
                 pass
             elif "2" == mode:
-                self.check("text")["not_empty"]()
-                self.check("font")["is_in"](fonts.fonts.keys())
+                self.check("text")["not_empty"]()["is_url_salf_base64"]()
+                self.check("font")["is_in"](fonts.fonts.keys())["is_url_salf_base64"]()
                 self.check("format", "Unsupported format")["is_in"](["jpg", "jpeg", "gif", "png"])
+                self.check("fill")["is_url_salf_base64"]()
                 self.check("interlace")["is_in"](["0", "1"])
                 self.check("dx")["is_positive_int"]()
                 self.check("dy")["is_positive_int"]()
@@ -177,25 +178,16 @@ class ImageViewHandler(BaseImageHandler):
                 dx = self.get_argument("dx", "10")
                 dy = self.get_argument("dy", "10")
 
-                # @see http://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
-                # lens = len(strg)
-                # lenx = lens - (lens % 4 if lens % 4 else 4)
-                # try:
-                #     result = base64.decodestring(strg[:lenx])
-                # except etc
+                # http://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
+                text = base64.urlsafe_b64decode(text)
+                font = base64.urlsafe_b64decode(font)
+                fill = base64.urlsafe_b64decode(fill)
 
-                try:
-                    text = base64.urlsafe_b64decode(text)
-                    font = base64.urlsafe_b64decode(font)
-                    fill = base64.urlsafe_b64decode(fill)
-                except TypeError:
-                    raise
+                im = image_utils.image_water_mark_text(im, text, font=font,
+                        fontsize=int(fontsize), fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
 
-                im = image_utils.image_water_mark_text(im, text, font=font, fontsize=int(fontsize),
-                                                       fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
-
-                # im = image_utils.image_water_mark_text(im, text, font=font, fontsize=int(fontsize),
-                #                                        fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
+                # im = image_utils.image_water_mark_text(im, text, font=font,
+                #       fontsize=int(fontsize), fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
                 self.write_image(im, filename, ext)
         elif IMAGE_AVE == interface:
             pass

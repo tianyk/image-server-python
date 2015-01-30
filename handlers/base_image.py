@@ -25,7 +25,7 @@ IMAGE_AVE = "imageAve"
 # @see https://infohost.nmt.edu/tcc/help/pubs/pil/formats.html
 # http://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html
 IMAGE_FORMATS = {
-    "jgp": "JPEG",
+    "jpg": "JPEG",
     "gif": "GIF",
     "png": "PNG",
     "webp": "WebP"
