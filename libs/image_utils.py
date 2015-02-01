@@ -3,6 +3,8 @@
 
 from __future__ import division
 import re
+import colorsys
+import optparse
 from PIL import Image, ImageFilter, ImageColor, ImageFont, ImageDraw
 from libs import fonts
 
@@ -667,5 +669,52 @@ def image_water_mark_image(im, mark_im, dissolve=100, gravity="SouthEast", dx=10
     re_point = _re_point(size, point, mark_im_size, dx, dy)
 
     # @see http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil/9459208#9459208
-    im.paste(mark_im_size, re_point, mask=mark_im_size.split()[3])
+    im.paste(mark_im, box=re_point, mask=mark_im.split()[3])
     return im
+
+
+def get_dominant_color(im):
+    """
+    Find a PIL image's dominant color, returning an (r, g, b) tuple.
+    """
+    im = im.convert('RGBA')
+    # Shrink the image, so we don't spend too long analysing color
+    # frequencies. We're not interpolating so should be quick.
+    ## image.thumbnail((200, 200))
+    max_score = 1
+    # dominant_color = []
+    dominant_color = None
+    for count, (r, g, b, a) in im.getcolors(im.size[0] * im.size[1]):
+        # Skip 100% transparent pixels
+        if a == 0:
+            continue
+        # Get color saturation, 0-1
+        saturation = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)[1]
+        # Calculate luminance - integer YUV conversion from
+        # http://en.wikipedia.org/wiki/YUV
+        y = min(abs(r * 2104 + g * 4130 + b * 802 + 4096 + 131072) >> 13, 235)
+        # Rescale luminance from 16-235 to 0-1
+        y = (y - 16.0) / (235 - 16)
+        # Ignore the brightest colors
+        if y > 0.9:
+            continue
+        # Calculate the score, preferring highly saturated colors.
+        # Add 0.1 to the saturation so we don't completely ignore grayscale
+        # colors by multiplying the count by zero, but still give them a low
+        # weight.
+        # 权重
+        score = (saturation + 0.1) * count
+
+        # if score > max_score:
+        #     max_score = score
+        #     dominant_color.append((r, g, b))
+        if score > max_score:
+            max_score = score
+            dominant_color = (r, g, b)
+    return dominant_color
+
+
+def image_ave(im):
+    im_ave = get_dominant_color(im)
+    print '0x%02x%02x%02x' % im_ave
+    return

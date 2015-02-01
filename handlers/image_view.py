@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
+import os
 import urllib
 import base64
 from PIL import Image, ExifTags
@@ -170,20 +171,18 @@ class ImageViewHandler(BaseImageHandler):
                 dy = self.get_argument("dy", "10")
 
                 image = base64.urlsafe_b64decode(image)
-
-                image_name = download.download_image(image)
-                if not image_name:
-                    # TODO
+                # 有URL暂时改为文件名
+                # image_name = download.download_image(image)
+                mark_filename, mark_ext = os.path.splitext(image)
+                mark_im_path = upload.get_file_path(mark_filename, mark_ext[1:])
+                if not mark_im_path:
+                    # TODO 提示错误，水印文件找不到。
+                    self.write_blank()
                     return
                 else:
-                    image_path = path = TEMP_DIR + "/" + str(image_name)
-                    mark_im = Image.open(image_path)
-                    verified = mark_im.verify()
-                    if verified:
-                        image_utils.image_water_mark_image()
-                    else:
-                        pass
-
+                    mark_im = Image.open(mark_im_path)
+                    im = image_utils.image_water_mark_image(im, mark_im, dissolve=dissolve,
+                                                       gravity=gravity, dx=int(dx), dy=int(dy))
 
             elif "2" == mode:
                 self.check("text")["not_empty"]()["is_base64"]()
@@ -219,8 +218,18 @@ class ImageViewHandler(BaseImageHandler):
 
                 # im = image_utils.image_water_mark_text(im, text, font=font,
                 #       fontsize=int(fontsize), fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
+
+            format = self.get_argument("format", None)
+            interlace = self.get_argument("interlace", None)
+            if format:  # 首先校验format是否被支持
+                ext = format
+
+            if interlace:
+                self.write_image(im, filename, ext, interlace)
+            else:
                 self.write_image(im, filename, ext)
         elif IMAGE_AVE == interface:
-            pass
+            im_ave = image_utils.image_ave(im)
+            self.write_json({im.mode: im_ave})
         else:  # 直接返回原图
             self.write_image(im, filename, ext)
