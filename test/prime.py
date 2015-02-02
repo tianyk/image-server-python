@@ -1,0 +1,1 @@
+#!/usr/bin/env python# -*- coding: utf-8 -*-__author__ = 'tyk'# import time# import numpy as np## start = time.time()# N = 1000000000# is_prime = np.ones#

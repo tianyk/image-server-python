@@ -14,21 +14,21 @@ def image_view_mode_0(im, long_edge, short_edge):
         限定缩略图的长边最多为<LongEdge>，短边最多为<ShortEdge>，进行等比缩放，不裁剪。
         如果只指定 w 参数则表示限定长边（短边自适应），只指定 h 参数则表示限定短边（长边自适应）。
         eg:
-                w = 1000
-                h = 600
-                origin_long_edge = 1000
-                origin_short_edge = 600
+            w = 600 # 原图宽度600像素
+            h = 400 # 原图高度400像素
+            origin_long_edge = 600 # 原图长边600像素
+            origin_short_edge = 400 # 原图短边400像素
 
-                long_edge = 800
-                short_edge = 600
+            long_edge = 500 # 缩放后长边最多为500像素
+            short_edge = 200 # 缩放后短边最多为200像素
 
-                ratio_long = 800 / 1000 = 0.8
-                ratio_short = 600 / 600 = 1
-                # 取比例的最小值
-                min_ratio = 0.8
+            ratio_long = 500 / 600 = 0.83
+            ratio_short = 200 / 400 = 0.50
+            # 取比例的最小值
+            min_ratio = min(ratio_long, ratio_short) = 0.50
 
-                resize_long_edge = 1000 * 0.8 = 800 # 长边最多800
-                resize_short_edge = 600 * 0.8 = 480 # 短边最多600
+            resize_long_edge = origin_long_edge * min_ratio = 300 # 长边要求最多为500
+            resize_short_edge = origin_short_edge * min_ratio = 200 # 短边要求最多为200
     """
     if not long_edge and not short_edge:
         return
@@ -79,10 +79,11 @@ def image_view_mode_1(im, w, h):
     max_ratio = max(ratio_w, ratio_h)
     min_ratio = min(ratio_w, ratio_h)
 
-    if min_ratio >= 1:  # 两边大
+    if min_ratio >= 1:  # 两边都大
         return
 
-    if max_ratio < 1:  # 两者均小于原来
+    if max_ratio < 1:  # 两边均小于原来
+        # 新规格
         size = resize = tuple(int(x * max_ratio) for x in size)
         im = im.resize(resize)
     box = []
@@ -716,5 +717,6 @@ def get_dominant_color(im):
 
 def image_ave(im):
     im_ave = get_dominant_color(im)
-    print '0x%02x%02x%02x' % im_ave
-    return
+    # print [hex(x)[2:] for x in im_ave]
+    # print '0x%02x%02x%02x' % im_ave
+    return '0x{0:02x}{1:02x}{2:02x}'.format(*im_ave)
