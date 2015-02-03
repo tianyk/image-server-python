@@ -3,6 +3,7 @@
 
 from __future__ import division
 import re
+import math
 import colorsys
 import optparse
 from PIL import Image, ImageFilter, ImageColor, ImageFont, ImageDraw
@@ -267,11 +268,9 @@ def image_mogr_auto_orient(im):
             im.transpose(Image.ROTATE_90).transpose(Image.FLIP_LEFT_RIGHT)
         elif orientation == 8:
             im.transpose(Image.ROTATE_90)
-        else:
-            pass
 
-            # 重新修正Orientation值
-            # im['Orientation'] = 1
+        # 重新修正Orientation值
+        # im['Orientation'] = 1
 
     return im
 
@@ -420,7 +419,6 @@ def image_mogr_thumbnail(im, image_size_geometry):
             resize = tuple(int(x * ratio) for x in size)
             im = im.resize(resize)
     elif re.match(r"^([1-9][0-9]*)x([1-9][0-9]*)<$", image_size_geometry):
-        # fix
         image_size_geometry = [int(x) for x in image_size_geometry[:-1].split("x")]
         if min(image_size_geometry) >= 10000:
             return
@@ -433,14 +431,13 @@ def image_mogr_thumbnail(im, image_size_geometry):
             resize = tuple(int(x * ratio) for x in size)
             im = im.resize(resize)
     elif re.match(r"^([1-9][0-9]*)@$", image_size_geometry):
-        # fix
         area = int(image_size_geometry[:-1])
         if area > 100000000:
             return
 
         size = im.size
         origin_area = size[0] * size[1]
-        ratio = area / origin_area
+        ratio = math.sqrt(area / origin_area)
         resize = tuple(int(x * ratio) for x in size)
         im = im.resize(resize)
 

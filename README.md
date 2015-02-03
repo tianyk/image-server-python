@@ -72,7 +72,7 @@ tornado (4.0.2)
 
 返回图片规格为`300 * 200`
 
-**伪代码**
+**计算过程**
 
     w = 600 # 原图宽度600像素
     h = 400 # 原图高度400像素
@@ -97,7 +97,7 @@ tornado (4.0.2)
 
 返回图片规格为 `500 * 200`
 
-**伪代码**
+**计算过程**
 
     w = 600 # 原图宽度600像素
     h = 400 # 原图高度400像素
@@ -129,7 +129,7 @@ tornado (4.0.2)
 
 返回图片规格为`300 * 200`
 
-**伪代码**
+**计算过程**
 
     w = 600 # 原图宽度600像素
     h = 400 # 原图高度400像素
@@ -153,7 +153,7 @@ tornado (4.0.2)
 
 返回图片规格为`500 * 332`
 
-**伪代码**
+**计算过程**
 
     w = 600 # 原图宽度600像素
     h = 400 # 原图高度400像素
@@ -177,7 +177,7 @@ tornado (4.0.2)
 
 返回图片规格为`500 * 332`
 
-**伪代码**
+**计算过程**
 
     w = 600 # 原图宽度600像素
     h = 400 # 原图高度400像素
@@ -270,4 +270,296 @@ tornado (4.0.2)
 |`/thumbnail/x<Height>`| |指定目标图片高度，宽度等比缩放。取值范围0-10000。|
 |`/thumbnail/<Width>x<Height>`| |限定长边，短边自适应缩放，将目标图片限制在指定宽高矩形内。取值范围不限，但若宽高超过10000只能缩不能放。|
 |`/thumbnail/!<Width>x<Height>r`| | 限定短边，长边自适应缩放，目标图片会延伸至指定宽高矩形外。取值范围不限，但若宽高超过10000只能缩不能放。|
+|`/thumbnail/<Width>x<Height>!`| |限定目标图片宽高值，忽略原图宽高比例，按照指定宽高值强行缩略，可能导致目标图片变形。取值范围不限，但若宽高超过10000只能缩不能放。|
+|`/thumbnail/<Width>x<Height>>`| |当原图尺寸大于给定的宽度或高度时，按照给定宽高值缩小。取值范围不限，但若宽高超过10000只能缩不能放。|
+|`/thumbnail/<Width>x<Height><`| |当原图尺寸小于给定的宽度或高度时，按照给定宽高值放大。取值范围不限，但若宽高超过10000只能缩不能放。|
+|`/thumbnail/<Area>@`| |按原图高宽比例等比缩放，缩放后的像素数量不超过指定值。取值范围不限，但若像素数超过100000000只能缩不能放。|
+
+**图片处理重心参数表**
+在高级图片处理现有的功能中只影响其后的裁剪偏移参数，即裁剪操作以`gravity`为原点开始偏移后，进行裁剪操作。
+
+    NorthWest     |     North      |     NorthEast
+                  |                |    
+                  |                |    
+    --------------+----------------+--------------
+                  |                |    
+    West          |     Center     |          East 
+                  |                |    
+    --------------+----------------+--------------
+                  |                |    
+                  |                |    
+    SouthWest     |     South      |     SouthEast
+
+
+**裁剪操作参数表（cropSize）**
+
+|参数名称|必填|说明|
+|--------|----|----|
+|`/crop/!{cropSize}a<dx>a<dy>`||相对于偏移锚点，向右偏移dx个像素，同时向下偏移dy个像素。取值范围不限，小于原图宽高即可。|
+|`/crop/!{cropSize}-<dx>a<dy>`||相对于偏移锚点，向下偏移dy个像素，同时从指定宽度中减去dx个像素。取值范围不限，小于原图宽高即可。|
+|`/crop/!{cropSize}a<dx>-<dy>`||相对于偏移锚点，向右偏移dx个像素，同时从指定高度中减去个像素。取值范围不限，小于原图宽高即可。|
+|`/crop/!{cropSize}-<dx>-<dy>`||相对于偏移锚点，从指定宽度中减去dx个像素，同时从指定高度中减去dy个像素。取值范围不限，小于原图宽高即可。|
+
+例如，  
+`/crop/!300x400a10a10`表示从源图坐标为x:10,y:10处截取300x400的子图片。  
+`/crop/!300x400-10a10`表示从源图坐标为x:0,y:10处截取290x400的子图片。  
+
+注意1：必须同时指定横轴偏移和纵轴偏移。  
+注意2：计算偏移值会受到位置偏移指示符（/gravity/）影响。默认为相对于左上角计算偏移值（即NorthWest），参看裁剪锚点参数表。  
+
+**转义说明**
+部分参数以“!”开头，表示参数将被转义。为便于阅读，我们采用特殊转义方法，如下所示：
+
+    p => % (percent)
+    r => ^ (reverse)
+    a => + (add)
+
+即!50x50r实际代表50x50^这样一个字符串。  
+而!50x50实际代表50x50这样一个字符串（该字符串并不需要转义）。  
+<imageSizeAndOffsetGeometry>中的OffsetGeometry部分可以省略，缺省为+0+0。  
+即/crop/50x50等价于/crop/!50x50a0a0，执行-crop 50x50+0+0语义。  
+
+#### 请求
+**请求报文格式**
+
+    GET <imageDownloadURI>?<接口规格> HTTP/1.1
+
+#### 示例
+说明：
+原图规格`600 * 400`
+
+**缩放操作**
+
+**请求参数**
+
+    <ImageDownloadURI>?imageMogr/thumbnail/!75p
+
+返回图片规格为`450 * 300`
+
+**计算过程**
+
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    scale = 75 # 缩放系数
+
+    resize_w = w * (scale / 100) = 450 # 缩放后宽度为450像素
+    resize_h = h * (scale / 100) = 300 # 缩放后高度为300像素 
+
+
+**请求参数**
+
+    <ImageDownloadURI>?imageMogr/thumbnail/!75px
+
+返回图片规格`450 * 400`
+
+**计算过程**
+
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    scale = 75 # 缩放系数
+
+    resize_w = w * (scale / 100) = 450 # 缩放后宽度为450像素
+    resize_h = h = 400 # 高度不缩放
+
+
+**请求参数**
+
+    <ImageDownloadURI>?imageMogr/thumbnail/!x75p
+
+返回图片规格`600 * 300`
+
+**计算过程**
+
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    scale = 75 # 缩放系数
+
+    resize_w = w = 600 # 高度不缩放
+    resize_h = h * (scale / 100) = 300 # 缩放后高度为300像素
+
+
+**请求参数**
+    
+    <ImageDownloadURI>?imageMogr/thumbnail/300x
+
+返回图片规格`300 * 200`
+
+**计算过程**
+    
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    resize_w = 300 # 缩放后图片宽度为300像素
+
+    ratio = resize_w / w = 0.50 # 缩放比例为0.50
+    resize_h = h * ratio = 200 # 高度等比缩放
+
+
+**请求参数**
+
+    <ImageDownloadURI>?imageMogr/thumbnail/x300
+
+返回图片格式`450 * 300`
+
+**计算过程**
+
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    resize_h = 300 # 缩放后图片高度为300像素
+
+    ratio = resize_h / h = 0.75 # 高度缩放比例
+    resize_w = w * ratio = 450 # 宽度等比缩放
+
+
+**请求参数**
+
+    <ImageDownloadURI>?imageMogr/thumbnail/500x300
+
+返回图片规格`450 * 300`
+    
+**计算过程**
+    
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    long_edge = 500 # 缩放后最大长边
+    short_edge = 300 # 缩放后最大短边
+
+    origin_long_edge = max(w, h) = 600 # 长边
+    origin_short_edge = min(w, h) = 400 # 短边
+        
+    ratio_long = long_edge / origin_long_edge = 0.83 # 长边缩放比例
+    ratio_short = short_edge / origin_short_edge = 0.75 # 短边缩放比例
+    # 目标图片在指定高宽内，取最小缩放比例
+    min_ratio = min(ratio_long, ratio_short) = 0.75 # 最小缩放比例
+
+    resize_w = w * min_ratio = 450 # 缩放后宽度
+    resize_h = h * min_ratio = 300 # 缩放后高度
+
+
+**请求参数**
+    
+    <ImageDownloadURI>?imageMogr/thumbnail/!500x300r
+
+返回图片格式`500 * 332`
+
+**计算过程**
+    
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    long_edge = 500 # 缩放后最大长边
+    short_edge = 300 # 缩放后最大短边
+
+    origin_long_edge = max(w, h) = 600 # 长边
+    origin_short_edge = min(w, h) = 400 # 短边
+        
+    ratio_long = long_edge / origin_long_edge = 0.83 # 长边缩放比例
+    ratio_short = short_edge / origin_short_edge = 0.75 # 短边缩放比例
+    # 目标图片在指定高宽外，取最大缩放比例
+    max_ratio = min(ratio_long, ratio_short) = 0.83 # 最小缩放比例
+
+    resize_w = w * max_ratio = 500 # 缩放后宽度
+    resize_h = h * max_ratio = 332 # 缩放后高度
+
+
+**请求参数**
+    
+    <ImageDownloadURI>?imageMogr/thumbnail/500x300!
+
+返回图片格式`500 * 300`
+
+**计算过程**
+    
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    width = 500 # 缩放后宽度
+    height = 300 # 缩放后高度
+
+    resize_w = width
+    resize_h = height 
+
+
+**请求参数**
+    
+    <ImageDownloadURI>?imageMogr/thumbnail/500x300>
+
+返回图片格式`500 * 300`
+
+**计算过程**
+    
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    # 仅当宽、高都比原图小时才会进行缩放
+    width = 500 # 缩放后宽度
+    height = 300 # 缩放后高度
+
+    ratio_w = width / w = 0.83
+    ratio_h = height / w = 0.75
+    # 取最小比例
+    min_ratio = min(ratio_w, ratio_h) = 0.75
+
+    resize_w = w * min_ratio = 500 
+    resize_h = h * min_ratio = 332
+
+
+**请求参数**
+    
+    <ImageDownloadURI>?imageMogr/thumbnail/800x800<
+
+返回图片格式`800 * 532`
+
+**计算过程**
+    
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    # 仅当宽、高都比原图大时才会进行缩放
+    width = 800 # 缩放后宽度
+    height = 800 # 缩放后高度
+
+    ratio_w = width / w = 1.33
+    ratio_h = height / w = 2.00
+    min_ratio = min(ratio_w, ratio_h) = 1.33
+
+    resize_w = w * min_ratio = 800 
+    resize_h = h * min_ratio = 532
+
+
+**请求参数**
+    
+    <ImageDownloadURI>?imageMogr/thumbnail/3600000@
+
+返回图片格式`800 * 532`
+
+**计算过程**
+    
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    max_area = 360000 # 等比例缩放后最大像素为3600000
+    origin_area = w * h = 240000 # 原图像素
+
+    ratio = math.sqrt(max_area / origin_area) = 3.87 # 面积比开方即为等比缩放比例
+
+    resize_w = w * ratio = 2322 # 缩放后宽度
+    resize_h = h * ratio = 1548 # 缩放后高度
+
+
+
+**基础裁剪**
+
+**请求参数**
+    
+    <ImageDownloadURI>?imageMogr/thumbnail/3600000@
+
+返回图片格式`800 * 532`
+
+**计算过程**
+    
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    max_area = 360000 # 等比例缩放后最大像素为3600000
+    origin_area = w * h = 240000 # 原图像素
+
+    ratio = math.sqrt(max_area / origin_area) = 3.87 # 面积比开方即为等比缩放比例
+
+    resize_w = w * ratio = 2322 # 缩放后宽度
+    resize_h = h * ratio = 1548 # 缩放后高度
+
 
