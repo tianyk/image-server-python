@@ -509,12 +509,20 @@ def get_box(size, point, width, height, dx=0, dy=0):
         box[1] -= (box[3] - size[1])
         box[3] = size[1]
 
+    # 首先判断偏移后是否超出原图范围，如果超出则尽最大可能偏移。保证截图仍在原图内
     if box[2] + dx > size[0]:
         box[0] += (size[0] - box[2])
         box[2] = size[0]
+    else:
+        box[0] += dx
+        box[2] += dx
+
     if box[3] + dy > size[1]:
         box[1] += (size[1] - box[3])
-        box[1] = size[1]
+        box[3] = size[1]
+    else:
+        box[1] += dy
+        box[3] += dy
 
     return tuple(box)
 
