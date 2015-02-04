@@ -335,7 +335,7 @@ tornado (4.0.2)
 
 **缩放操作**
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/thumbnail/!75p
 
@@ -351,7 +351,7 @@ tornado (4.0.2)
     resize_h = h * (scale / 100) = 300 # 缩放后高度为300像素 
 
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/thumbnail/!75px
 
@@ -367,7 +367,7 @@ tornado (4.0.2)
     resize_h = h = 400 # 高度不缩放
 
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/thumbnail/!x75p
 
@@ -383,7 +383,7 @@ tornado (4.0.2)
     resize_h = h * (scale / 100) = 300 # 缩放后高度为300像素
 
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/thumbnail/300x
 
@@ -399,7 +399,7 @@ tornado (4.0.2)
     resize_h = h * ratio = 200 # 高度等比缩放
 
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/thumbnail/x300
 
@@ -415,7 +415,7 @@ tornado (4.0.2)
     resize_w = w * ratio = 450 # 宽度等比缩放
 
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/thumbnail/500x300
 
@@ -440,7 +440,7 @@ tornado (4.0.2)
     resize_h = h * min_ratio = 300 # 缩放后高度
 
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/thumbnail/!500x300r
 
@@ -465,7 +465,7 @@ tornado (4.0.2)
     resize_h = h * max_ratio = 332 # 缩放后高度
 
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/thumbnail/500x300!
 
@@ -482,7 +482,7 @@ tornado (4.0.2)
     resize_h = height 
 
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/thumbnail/500x300>
 
@@ -505,7 +505,7 @@ tornado (4.0.2)
     resize_h = h * min_ratio = 332
 
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/thumbnail/800x800<
 
@@ -527,7 +527,7 @@ tornado (4.0.2)
     resize_h = h * min_ratio = 532
 
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/thumbnail/3600000@
 
@@ -549,7 +549,7 @@ tornado (4.0.2)
 
 **基础裁剪**
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/crop/200x
 
@@ -571,7 +571,7 @@ tornado (4.0.2)
     box[3] = h
 
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/crop/x200
 
@@ -593,7 +593,7 @@ tornado (4.0.2)
     box[3] = height
 
 
-**请求参数**
+##### 请求参数
     
     <ImageDownloadURI>?imageMogr/crop/300x200
 
@@ -618,7 +618,7 @@ tornado (4.0.2)
 
 **偏移裁剪**
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/gravity/Center/crop/!200x200a10a10
 
@@ -652,7 +652,7 @@ tornado (4.0.2)
     box[3] += dy = 310
 
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/gravity/Center/crop/!200x200-10a10
 
@@ -686,7 +686,7 @@ tornado (4.0.2)
     box[3] += dy = 310
 
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/gravity/Center/crop/!200x200a10-10
 
@@ -720,7 +720,7 @@ tornado (4.0.2)
     box[2] += dx = 410
 
 
-**请求参数**
+##### 请求参数
 
     <ImageDownloadURI>?imageMogr/gravity/Center/crop/!200x200-10-10
 
@@ -750,7 +750,7 @@ tornado (4.0.2)
     box[3] = point[1] + (height / 2) = 295
 
 
-### 图片水印处理（watermark）
+### 水印处理（watermark）
 
 #### 描述
 此接口提供图片水印、文字水印
@@ -790,10 +790,68 @@ tornado (4.0.2)
                   |                |    
     SouthWest     |     South      |     SouthEast
 
-##### 请求
+
+#### 文字水印
+**规格接口规格**  
+注意：接口规格不含任何空格与换行符，下列内容经过格式化以便阅读。
+
+    watermark/2
+             /text/<encodedText>
+             /font/<encodedFontName>
+             /fontsize/<fontSize>
+             /fill/<encodedTextColor>
+             /dissolve/<dissolve>
+             /gravity/<gravity>
+             /dx/<distanceX>
+             /dy/<distanceY>
+
+|参数名称|必填|说明|
+|`/text/<encodedText>`|是|水印文字内容（经过URL安全的Base64编码）|
+|`/font/<encodedFontName>`||水印文字字体（经过URL安全的Base64编码），缺省为黑体。
+注意：中文水印必须指定中文字体。|
+|`/fontsize/<fontSize>`||水印文字大小，单位像素|
+|`/fill/<encodedTextColor>`||印文字颜色，RGB格式，可以是颜色名称（比如red）或十六进制（比如#FF0000），缺省为白色|
+|~~`/dissolve/<dissolve>`~~||~~透明度，取值范围1-100，缺省值100（完全不透明）~~|
+|`/gravity/<gravity>`||水印位置，参考水印位置参数表，缺省值为SouthEast（右下角）|
+|`/dx/<distanceX>`||横轴边距，单位:像素(px)，缺省值为10|
+|`/dy/<distanceY>`||纵轴边距，单位:像素(px)，缺省值为10|
+
+
+
+#### 请求
 请求报文格式
 
     GET <imageDownloadURI>?<接口规格> HTTP/1.1
 
+
 ##### 图片水印示例
+
+##### 请求参数
+
+    <ImageDownloadURI>?watermark/2/gravity/SouthEast/text/5Zu-54mH5rC05Y2w/font/6buR5L2T/fontsize/20/dx/15/dy/15
+
+
+##### 计算过程
+
+    w = 600 # 原图宽为600像素
+    h = 400 # 原图高为400像素
+    dx = 15 # 横向边界
+    dy = 15 # 纵向边界
+
+    # load水印图片。假设水印图片宽100像素，高30像素
+    # 水印图片大小不能大于原图
+    mark_im_size = (100, 30)
+
+    # 获得偏移锚点 偏移参数为SouthEast
+    point = (w, h) = (600, 400)
+
+    # 根据偏移参数重置锚点
+    # 如果偏移后边界超出底图，则重置偏移位
+    re_point[0] = point[0] - (mark_im_size[0] + dx) = 485
+    re_point[1] = point[1] - (mark_im_size[1] + dy) = 355
+
+
+
+
+
 
