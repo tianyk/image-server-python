@@ -21,13 +21,24 @@ class ImageWaterMark(DoogError):
         self.msg = msg
 
 
-class InvalidImageError(DoogError):
+class FileNotFoundError(DoogError):
     def __init__(self, url):
         self.url = url
-        self.msg = "This request URL " + url + " was not found on this server."
+        self.msg = "File Not Fount."
+
+
+class InvalidImageError(DoogError):
+    def __init__(self, filename, msg="invalid image File."):
+        self.filename = filename
+        self.msg = msg
+
+
+class ImageExifError(DoogError):
+    def __init__(self, filename, msg="no exif info"):
+        self.msg = msg
 
 
 if __name__ == "__main__":
-    error = InvalidImageError("www.baidu.com/logo.png")
+    error = FileNotFoundError("www.baidu.com/logo.png")
     import json
     print json.dumps(error, default=lambda obj: obj.__dict__)

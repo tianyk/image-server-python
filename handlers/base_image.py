@@ -231,30 +231,36 @@ class BaseImageHandler(tornado.web.RequestHandler):
         # self.set_header("Cache-Control", "max-age=" + str(24 * 60 * 60))
         self.write(img_data)
 
-    def write_blank(self):
-        self.set_status(404)
-        self.set_header("Content-Type", "text/plain")
-        self.set_header("Cache-Control", "no-store")
-        self.write("This request URL " + self.request.path + " was not found on this server.")
+    # def write_blank(self):
+    #     self.set_status(404)
+    #     self.set_header("Content-Type", "text/plain")
+    #     self.set_header("Cache-Control", "no-store")
+    #     self.write("This request URL " + self.request.path + " was not found on this server.")
 
-    def write_json(self, obj):
+    def write_check_errors(self, obj, status_code=400):
         try:
             res = json.dumps(obj)
+            self.set_status(status_code)
             self.set_header("Content-Type", "application/json; charset=UTF-8")
             self.write(res)
         except TypeError:
             raise
 
     def write_error(self, status_code, **kwargs):
-        error = kwargs["error"]
-        if isinstance(error, errors.DoogError):
-            res = json.dumps(error, default=lambda obj: obj.__dict__)
-            self.set_status(400)
-            self.set_header("Content-Type", "application/json; charset=UTF-8")
-            self.write(res)
-        elif status_code == 404:
+        exc_info = kwargs.get("exc_info", None)
+        if exc_info:
+            error = exc_info[1]
+            if isinstance(error, errors.DoogError):
+                res = json.dumps(error, default=lambda obj: obj.__dict__)
+                self.set_status(400)
+                self.set_header("Content-Type", "application/json; charset=UTF-8")
+                self.write(res)
+                return
+
+        if status_code == 404:
             self.render('404.html')
         elif status_code == 500:
             self.render('500.html')
         else:
-            super(BaseImageHandler, self).write_error(status_code, **kwargs)
+            # super(BaseImageHandler, self).write_error(status_code, **kwargs)
+            self.render('500.html')

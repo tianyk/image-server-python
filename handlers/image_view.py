@@ -8,7 +8,7 @@ import base64
 from PIL import Image, ExifTags
 from base_image import BaseImageHandler
 from libs import image_utils, upload, download, fonts
-from libs.errors import InvalidRequestError, ImageWaterMark, InvalidImageError
+from libs.errors import InvalidRequestError, ImageWaterMark, FileNotFoundError, InvalidImageError
 
 TEMP_DIR = "temp/"
 IMAGE_INFO = "imageInfo"
@@ -23,14 +23,12 @@ class ImageViewHandler(BaseImageHandler):
     def get(self, filename, ext):
         file_path = upload.get_file_path(filename, ext)
         if not file_path:
-            self.write_blank()
-            return
+            raise FileNotFoundError(filename + "." + ext)
 
         try:
             im = Image.open(file_path)
         except IOError:
-            self.write_blank()
-            return
+            raise InvalidImageError(filename + "." + ext)
 
         # 接口标识
         interface = self.get_argument("interface", None)
@@ -54,7 +52,7 @@ class ImageViewHandler(BaseImageHandler):
 
             errors = self.validation_errors()
             if errors:
-                self.write_json(errors)
+                self.write_check_errors(errors)
                 return
 
             mode = self.get_argument("mode", None)
@@ -93,7 +91,7 @@ class ImageViewHandler(BaseImageHandler):
                 ext = format
 
             if interlace:
-                self.write_image(im, filename, ext, interlace)
+                self.write_image(im, filename, ext, interlace=interlace)
             else:
                 self.write_image(im, filename, ext)
 
@@ -103,10 +101,11 @@ class ImageViewHandler(BaseImageHandler):
                 # dict(zip(d.keys(), map(lambda x:x * 2, d.values())))
                 # dict((k, v*2) for k, v in {'a': 1, 'b': 2}.items())
                 exif = dict((ExifTags.TAGS.get(k, k), v) for k, v in exif.items() if k in ExifTags.TAGS)
-                self.write_json(exif)
+                self.write_check_errors(exif)
             else:
-                self.write({"errcode": 400, "errmsg": "no exif info"})
-            return
+                # self.write({"errcode": 400, "errmsg": "no exif info"})
+                raise FileNotFoundError(filename + "." + ext)
+
         elif IMAGE_MOGR == interface:
             self.check("NorthWest")["is_in"](["NorthWest", "North", "NorthEast",
                                               "West", "Center", "East", "SouthWest", "South", "SouthEast"])
@@ -161,7 +160,7 @@ class ImageViewHandler(BaseImageHandler):
 
                 errors = self.validation_errors()
                 if errors:
-                    self.write_json(errors)
+                    self.write_check_errors(errors)
                     return
 
                 # 图片水印
@@ -177,7 +176,7 @@ class ImageViewHandler(BaseImageHandler):
                 mark_filename, mark_ext = os.path.splitext(image)
                 mark_im_path = upload.get_file_path(mark_filename, mark_ext[1:])
                 if not mark_im_path:
-                    raise InvalidImageError(file_path)
+                    raise FileNotFoundError(mark_filename + mark_ext)
                 else:
                     mark_im = Image.open(mark_im_path)
                     im = image_utils.image_water_mark_image(im, mark_im, dissolve=dissolve,
@@ -194,7 +193,7 @@ class ImageViewHandler(BaseImageHandler):
 
                 errors = self.validation_errors()
                 if errors:
-                    self.write_json(errors)
+                    self.write_check_errors(errors)
                     return
 
                 # 文字水印
@@ -226,6 +225,6 @@ class ImageViewHandler(BaseImageHandler):
                 self.write_image(im, filename, ext)
         elif IMAGE_AVE == interface:
             im_ave = image_utils.image_ave(im)
-            self.write_json({im.mode: im_ave})
+            self.write_check_errors({im.mode: im_ave})
         else:  # 直接返回原图
             self.write_image(im, filename, ext)
