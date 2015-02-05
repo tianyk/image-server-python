@@ -8,6 +8,7 @@ import base64
 from PIL import Image, ExifTags
 from base_image import BaseImageHandler
 from libs import image_utils, upload, download, fonts
+from libs.errors import InvalidRequestError, ImageWaterMark, InvalidImageError
 
 TEMP_DIR = "temp/"
 IMAGE_INFO = "imageInfo"
@@ -176,13 +177,11 @@ class ImageViewHandler(BaseImageHandler):
                 mark_filename, mark_ext = os.path.splitext(image)
                 mark_im_path = upload.get_file_path(mark_filename, mark_ext[1:])
                 if not mark_im_path:
-                    # TODO 提示错误，水印文件找不到。
-                    self.write_blank()
-                    return
+                    raise InvalidImageError(file_path)
                 else:
                     mark_im = Image.open(mark_im_path)
                     im = image_utils.image_water_mark_image(im, mark_im, dissolve=dissolve,
-                                                       gravity=gravity, dx=int(dx), dy=int(dy))
+                                                            gravity=gravity, dx=int(dx), dy=int(dy))
 
             elif "2" == mode:
                 self.check("text")["not_empty"]()["is_base64"]()
@@ -213,11 +212,8 @@ class ImageViewHandler(BaseImageHandler):
                 font = base64.urlsafe_b64decode(font)
                 fill = base64.urlsafe_b64decode(fill)
 
-                im = image_utils.image_water_mark_text(im, text, font=font,
-                        fontsize=int(fontsize), fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
-
-                # im = image_utils.image_water_mark_text(im, text, font=font,
-                #       fontsize=int(fontsize), fill=fill, dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
+                im = image_utils.image_water_mark_text(im, text, font=font, fontsize=int(fontsize), fill=fill,
+                                                       dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
 
             format = self.get_argument("format", None)
             interlace = self.get_argument("interlace", None)

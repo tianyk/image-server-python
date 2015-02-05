@@ -4,6 +4,7 @@
 import copy
 import inspect
 import urllib
+from libs import errors
 
 try:
     from cStringIO import StringIO
@@ -243,3 +244,17 @@ class BaseImageHandler(tornado.web.RequestHandler):
             self.write(res)
         except TypeError:
             raise
+
+    def write_error(self, status_code, **kwargs):
+        error = kwargs["error"]
+        if isinstance(error, errors.DoogError):
+            res = json.dumps(error, default=lambda obj: obj.__dict__)
+            self.set_status(400)
+            self.set_header("Content-Type", "application/json; charset=UTF-8")
+            self.write(res)
+        elif status_code == 404:
+            self.render('404.html')
+        elif status_code == 500:
+            self.render('500.html')
+        else:
+            super(BaseImageHandler, self).write_error(status_code, **kwargs)

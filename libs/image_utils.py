@@ -7,7 +7,7 @@ import math
 import colorsys
 import optparse
 from PIL import Image, ImageFilter, ImageColor, ImageFont, ImageDraw
-from libs import fonts
+from libs import fonts, errors
 
 
 def image_view_mode_0(im, long_edge, short_edge):
@@ -668,8 +668,7 @@ def image_water_mark_image(im, mark_im, dissolve=100, gravity="SouthEast", dx=10
     mark_im_size = mark_im.size
 
     if mark_im_size[0] + dx > size[0] or mark_im_size[1] + dy > size[1]:
-        # TODO 水印图片不能大于原图
-        return
+        raise errors.ImageWaterMark("water mark image is too large.")
 
     point = _get_gravity_point(size, gravity)
     re_point = _re_point(size, point, mark_im_size, dx, dy)
