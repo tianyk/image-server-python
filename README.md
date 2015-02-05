@@ -6,7 +6,6 @@ tornado (4.0.2)
 
 ### 依赖库
 * 图像处理 Pillow (2.7.0)
-* EXIF信息 [pyexiv2](http://tilloy.net/dev/pyexiv2/) (0.3.2)
 
 
 ## 接口说明
