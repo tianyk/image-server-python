@@ -61,36 +61,171 @@ tornado (4.0.2)
     GET <ImageDownloadURI>?<接口规格> HTTP/1.1
 
 #### 示例
-
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/0/w/500/h/200
-
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/0/w/500/h/200)
+说明：
+原图规格`600 * 400`
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/1/w/500/h/200
+##### mode=0
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/1/w/500/h/200)
+    <ImageDownloadURI>?imageView/0/w/500/h/200
+
+返回图片规格为`300 * 200`
+
+##### 计算过程
+
+    w = 600 # 原图宽度600像素
+    h = 400 # 原图高度400像素
+    origin_long_edge = 600 # 原图长边600像素
+    origin_short_edge = 400 # 原图短边400像素
+
+    long_edge = 500 # 缩放后长边最多为500像素
+    short_edge = 200 # 缩放后短边最多为200像素
+
+    ratio_long = long_edge / origin_long_edge = 0.83
+    ratio_short = short_edge / origin_short_edge = 0.50
+    # 取比例的最小值
+    min_ratio = min(ratio_long, ratio_short) = 0.50
+
+    resize_long_edge = origin_long_edge * min_ratio = 300 # 长边要求最多为500
+    resize_short_edge = origin_short_edge * min_ratio = 200 # 短边要求最多为200
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/2/w/500/h/200
+##### mode=1
+
+    <ImageDownloadURI>?imageView/1/w/500/h/200
+
+返回图片规格为 `500 * 200`
+
+##### 计算过程
+
+    w = 600 # 原图宽度600像素
+    h = 400 # 原图高度400像素
+
+    with = 500 # 宽度要求最少为500像素
+    height = 200 # 高度要求最少为200像素
+
+    ratio_w = width / w = 0.83
+    ratio_h = height / h = 0.50
+    # 取最大比例
+    max_ratio = max(ratio_w, ratio_h) = 0.83 
+
+    # 图片缩放后大小
+    resize_w = w * max_ratio = 500 
+    resize_h = h * max_ratio = 332
+
+    # 图片居中裁剪 
+    # 以左上角为圆点(0, 0)，右上角为(w, 0), 左下角为(0, h)
+    # 依次左、上、右、下
+    box[0] = (resize_w - w) / 2 = 0
+    box[1] = (resize_h - h) / 2 = 66
+    box[2] = box[0] + w = 500
+    box[3] = box[1] + h = 266
 
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/2/w/500/h/200)
+##### mode=2
+
+    <ImageDownloadURI>?imageView/2/w/500/h/200
+
+返回图片规格为`300 * 200`
+
+##### 计算过程
+
+    w = 600 # 原图宽度600像素
+    h = 400 # 原图高度400像素
+
+    with = 500 # 宽度要求最多为500像素
+    height = 200 # 高度要求最多为200像素
+
+    ratio_w = width / w = 0.83
+    ratio_h = height / h = 0.50
+    # 取最小比例
+    min_ratio = min(ratio_w, ratio_h) = 0.50 
+
+    # 图片缩放后大小
+    resize_w = w * min_ratio = 300 # 宽度最多500像素
+    resize_h = h * min_ratio = 200 # 高度最多200像素
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/3/w/500/h/200
+##### mode=3
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/3/w/500/h/200)
+    <ImageDownloadURI>?imageView/2/w/500/h/200
+
+返回图片规格为`500 * 332`
+
+##### 计算过程
+
+    w = 600 # 原图宽度600像素
+    h = 400 # 原图高度400像素
+
+    with = 500 # 宽度要求最多少500像素
+    height = 200 # 高度要求最少为200像素
+
+    ratio_w = width / w = 0.83
+    ratio_h = height / h = 0.50
+    # 取最大比例
+    max_ratio = max(ratio_w, ratio_h) = 0.83 
+
+    # 图片缩放后大小
+    resize_w = w * min_ratio = 500 # 宽度最少500像素
+    resize_h = h * min_ratio = 332 # 高度最少200像素
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/4/w/500/h/200
+##### mode=4
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/4/w/500/h/200)
+    <ImageDownloadURI>?imageView/2/w/500/h/200
 
+返回图片规格为`500 * 332`
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/5/w/500/h/200
+##### 计算过程
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageView/5/w/500/h/200)
+    w = 600 # 原图宽度600像素
+    h = 400 # 原图高度400像素
+    origin_long_edge = 600 # 原图长边600像素
+    origin_short_edge = 400 # 原图短边400像素
+
+    long_edge = 500 # 缩放后长边最少为500像素
+    short_edge = 200 # 缩放后短边最少为200像素
+
+    ratio_long = long_edge / origin_long_edge = 0.83
+    ratio_short = short_edge / origin_short_edge = 0.50
+    # 取比例的最小值
+    max_ratio = max(ratio_long, ratio_short) = 0.83
+  
+    # 图片缩放后大小
+    resize_long_edge = w * min_ratio = 500 # 长边最少500像素
+    resize_ratio_short = h * min_ratio = 332 # 短边最少200像素
+
+##### mode=5
+
+    <ImageDownloadURI>?imageView/2/w/500/h/200
+
+返回图片规格为`500 * 200`
+
+    w = 600 # 原图宽度600像素
+    h = 400 # 原图高度400像素
+    origin_long_edge = 600 # 原图长边600像素
+    origin_short_edge = 400 # 原图短边400像素
+
+    long_edge = 500 # 缩放后长边最少为500像素
+    short_edge = 200 # 缩放后短边最少为200像素
+
+    ratio_long = long_edge / origin_long_edge = 0.83
+    ratio_short = short_edge / origin_short_edge = 0.50
+    # 取比例的最小值
+    max_ratio = max(ratio_long, ratio_short) = 0.83
+
+    # 图片缩放后大小
+    resize_long_edge = w * min_ratio = 500 # 长边最少500像素。即缩放后宽度
+    resize_ratio_short = h * min_ratio = 332 # 短边最少200像素。即缩放后高度
+    resize_w = resize_long_edge
+    resize_h = resize_ratio_short
+
+    # 图片居中裁剪 
+    box[0] = (resize_w - long_edge) / 2 = 0
+    box[1] = (resize_h - short_edge) / 2 = 66
+    box[2] = box[0] + long_edge = 500
+    box[3] = box[1] + short_edge = 266
+
 
 ### 高级图像处理（imageMogr)
 

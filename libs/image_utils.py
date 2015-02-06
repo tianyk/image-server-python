@@ -136,11 +136,12 @@ def image_view_mode_3(im, w, h):
 
     size = im.size
     if not w:
-        h = int(h)
         w = h
     if not h:
-        w = int(w)
         h = w
+
+    w = int(w)
+    h = int(h)
 
     ratio_w = w / size[0]
     ratio_h = h / size[1]
@@ -166,11 +167,12 @@ def image_view_mode_4(im, long_edge, short_edge):
     origin_short_edge = min(size)
 
     if not long_edge:
-        short_edge = int(short_edge)
         long_edge = short_edge
     if not short_edge:
-        long_edge = int(long_edge)
         short_edge = long_edge
+
+    long_edge = int(long_edge)
+    short_edge = int(short_edge)
 
     ratio_long = long_edge / origin_long_edge
     ratio_short = short_edge / origin_short_edge
