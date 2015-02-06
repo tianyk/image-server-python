@@ -8,7 +8,8 @@ import base64
 from PIL import Image, ExifTags
 from base_image import BaseImageHandler
 from libs import image_utils, upload, download, fonts
-from libs.errors import InvalidRequestError, ImageWaterMark, FileNotFoundError, InvalidImageError
+from libs.errors import InvalidRequestError, ImageWaterMark, FileNotFoundError, InvalidImageError, FontNotSupport
+from libs import validator
 
 TEMP_DIR = "temp/"
 IMAGE_INFO = "imageInfo"
@@ -184,7 +185,8 @@ class ImageViewHandler(BaseImageHandler):
 
             elif "2" == mode:
                 self.check("text")["not_empty"]()["is_base64"]()
-                self.check("font")["is_in"](fonts.fonts.keys())["is_base64"]()
+                # self.check("font")["is_in"](fonts.fonts.keys())["is_base64"]()
+                self.check("font")["is_base64"]()
                 self.check("format", "Unsupported format")["is_in"](["jpg", "jpeg", "gif", "png"])
                 self.check("fill")["is_base64"]()
                 self.check("interlace")["is_in"](["0", "1"])
@@ -210,6 +212,9 @@ class ImageViewHandler(BaseImageHandler):
                 text = base64.urlsafe_b64decode(text)
                 font = base64.urlsafe_b64decode(font)
                 fill = base64.urlsafe_b64decode(fill)
+
+                if not validator.is_in(font, fonts.fonts.keys()):
+                    raise FontNotSupport(font)
 
                 im = image_utils.image_water_mark_text(im, text, font=font, fontsize=int(fontsize), fill=fill,
                                                        dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))

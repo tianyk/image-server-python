@@ -34,7 +34,14 @@ class InvalidImageError(DoogError):
 
 
 class ImageExifError(DoogError):
-    def __init__(self, filename, msg="no exif info"):
+    def __init__(self, filename, msg="no exif info."):
+        self.filename = filename
+        self.msg = msg
+
+
+class FontNotSupport(DoogError):
+    def __init__(self, font, msg="unsupported font."):
+        self.font = font
         self.msg = msg
 
 

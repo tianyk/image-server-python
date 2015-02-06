@@ -194,431 +194,104 @@ tornado (4.0.2)
 + auto-orient 参数是和图像处理顺序相关的，一般建议放在首位（根据原图EXIF信息自动旋正）
 
 #### 示例
-说明：
-原图规格`600 * 400`
 
-**缩放操作**
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/!75p
 
-##### 请求参数
-
-    <ImageDownloadURI>?imageMogr/thumbnail/!75p
-
-返回图片规格为`450 * 300`
-
-##### 计算过程
-
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    scale = 75 # 缩放系数
-
-    resize_w = w * (scale / 100) = 450 # 缩放后宽度为450像素
-    resize_h = h * (scale / 100) = 300 # 缩放后高度为300像素 
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/!75p)
 
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/!75px
 
-    <ImageDownloadURI>?imageMogr/thumbnail/!75px
-
-返回图片规格`450 * 400`
-
-##### 计算过程
-
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    scale = 75 # 缩放系数
-
-    resize_w = w * (scale / 100) = 450 # 缩放后宽度为450像素
-    resize_h = h = 400 # 高度不缩放
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/!75px)
 
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/!x75p
 
-    <ImageDownloadURI>?imageMogr/thumbnail/!x75p
-
-返回图片规格`600 * 300`
-
-##### 计算过程
-
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    scale = 75 # 缩放系数
-
-    resize_w = w = 600 # 高度不缩放
-    resize_h = h * (scale / 100) = 300 # 缩放后高度为300像素
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/!x75p)
 
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/300x
+
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/300x)
+
+
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/x300
+
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/x300)
+
+
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300
+
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300)
+
     
-    <ImageDownloadURI>?imageMogr/thumbnail/300x
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/!500x300r
 
-返回图片规格`300 * 200`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    resize_w = 300 # 缩放后图片宽度为300像素
-
-    ratio = resize_w / w = 0.50 # 缩放比例为0.50
-    resize_h = h * ratio = 200 # 高度等比缩放
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/!500x300r)
 
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300!
 
-    <ImageDownloadURI>?imageMogr/thumbnail/x300
-
-返回图片格式`450 * 300`
-
-##### 计算过程
-
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    resize_h = 300 # 缩放后图片高度为300像素
-
-    ratio = resize_h / h = 0.75 # 高度缩放比例
-    resize_w = w * ratio = 450 # 宽度等比缩放
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300!)
 
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300>
 
-    <ImageDownloadURI>?imageMogr/thumbnail/500x300
-
-返回图片规格`450 * 300`
-    
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    long_edge = 500 # 缩放后最大长边
-    short_edge = 300 # 缩放后最大短边
-
-    origin_long_edge = max(w, h) = 600 # 长边
-    origin_short_edge = min(w, h) = 400 # 短边
-        
-    ratio_long = long_edge / origin_long_edge = 0.83 # 长边缩放比例
-    ratio_short = short_edge / origin_short_edge = 0.75 # 短边缩放比例
-    # 目标图片在指定高宽内，取最小缩放比例
-    min_ratio = min(ratio_long, ratio_short) = 0.75 # 最小缩放比例
-
-    resize_w = w * min_ratio = 450 # 缩放后宽度
-    resize_h = h * min_ratio = 300 # 缩放后高度
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300>)
 
 
-##### 请求参数
-    
-    <ImageDownloadURI>?imageMogr/thumbnail/!500x300r
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/800x800<
 
-返回图片格式`500 * 332`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    long_edge = 500 # 缩放后最大长边
-    short_edge = 300 # 缩放后最大短边
-
-    origin_long_edge = max(w, h) = 600 # 长边
-    origin_short_edge = min(w, h) = 400 # 短边
-        
-    ratio_long = long_edge / origin_long_edge = 0.83 # 长边缩放比例
-    ratio_short = short_edge / origin_short_edge = 0.75 # 短边缩放比例
-    # 目标图片在指定高宽外，取最大缩放比例
-    max_ratio = min(ratio_long, ratio_short) = 0.83 # 最小缩放比例
-
-    resize_w = w * max_ratio = 500 # 缩放后宽度
-    resize_h = h * max_ratio = 332 # 缩放后高度
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/800x800<)
 
 
-##### 请求参数
-    
-    <ImageDownloadURI>?imageMogr/thumbnail/500x300!
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/3600000@
 
-返回图片格式`500 * 300`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    width = 500 # 缩放后宽度
-    height = 300 # 缩放后高度
-
-    resize_w = width
-    resize_h = height 
-
-
-##### 请求参数
-    
-    <ImageDownloadURI>?imageMogr/thumbnail/500x300>
-
-返回图片格式`500 * 300`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    # 仅当宽、高都比原图小时才会进行缩放
-    width = 500 # 缩放后宽度
-    height = 300 # 缩放后高度
-
-    ratio_w = width / w = 0.83
-    ratio_h = height / w = 0.75
-    # 取最小比例
-    min_ratio = min(ratio_w, ratio_h) = 0.75
-
-    resize_w = w * min_ratio = 500 
-    resize_h = h * min_ratio = 332
-
-
-##### 请求参数
-    
-    <ImageDownloadURI>?imageMogr/thumbnail/800x800<
-
-返回图片格式`800 * 532`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    # 仅当宽、高都比原图大时才会进行缩放
-    width = 800 # 缩放后宽度
-    height = 800 # 缩放后高度
-
-    ratio_w = width / w = 1.33
-    ratio_h = height / w = 2.00
-    min_ratio = min(ratio_w, ratio_h) = 1.33
-
-    resize_w = w * min_ratio = 800 
-    resize_h = h * min_ratio = 532
-
-
-##### 请求参数
-    
-    <ImageDownloadURI>?imageMogr/thumbnail/3600000@
-
-返回图片格式`800 * 532`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    max_area = 360000 # 等比例缩放后最大像素为3600000
-    origin_area = w * h = 240000 # 原图像素
-
-    ratio = math.sqrt(max_area / origin_area) = 3.87 # 面积比开方即为等比缩放比例
-
-    resize_w = w * ratio = 2322 # 缩放后宽度
-    resize_h = h * ratio = 1548 # 缩放后高度
-
-
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/3600000@)
 
 **基础裁剪**
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/crop/200x
+
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/crop/200x)
+
     
-    <ImageDownloadURI>?imageMogr/crop/200x
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/crop/x200
 
-返回图片格式`200 * 400`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    
-    width = 200 # 裁剪后的宽度
-
-    # 高度不变
-    # 以左上角为圆点(0, 0)，右上角为(w, 0), 左下角为(0, h)
-    # 依次左、上、右、下
-    box[0] = 0
-    box[1] = 0
-    box[2] = width
-    box[3] = h
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/crop/x200)
 
 
-##### 请求参数
-    
-    <ImageDownloadURI>?imageMogr/crop/x200
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/crop/300x200
 
-返回图片格式`600 * 200`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    
-    height = 200 # 裁剪后的高度
-
-    # 宽度不变
-    # 以左上角为圆点(0, 0)，右上角为(w, 0), 左下角为(0, h)
-    # 依次左、上、右、下
-    box[0] = 0
-    box[1] = 0
-    box[2] = w
-    box[3] = height
-
-
-##### 请求参数
-    
-    <ImageDownloadURI>?imageMogr/crop/300x200
-
-返回图片格式`200 * 400`
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    
-    width = 300 # 裁剪后的宽度
-    height = 200 # 裁剪后的高度
-
-    # 宽度不变
-    # 以左上角为圆点(0, 0)，右上角为(w, 0), 左下角为(0, h)
-    # 依次左、上、右、下
-    box[0] = 0
-    box[1] = 0
-    box[2] = width
-    box[3] = height
+![]( http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/crop/300x200)
 
 
 **偏移裁剪**
 
-##### 请求参数
 
-    <ImageDownloadURI>?imageMogr/gravity/Center/crop/!200x200a10a10
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200a10a10
 
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-
-    width = 200 # 裁剪图宽度
-    height = 200 # 裁剪图高度
-
-    dx = 10 # 向右偏移10像素
-    dy = 10 # 向下偏移10像素
-    
-    # gravity = Center
-    point = (w / 2, h / 2) = (300, 200) # 偏移锚点
-    # 裁剪图中心先趋于偏移锚点，后偏移。但是始终在原图范围内。
-    # 以偏移锚点为中心上下左右均分。
-    # 如果计算出来的边距为负或者大于原图宽高，则进行修正。
-    # 修正规则为，截图中心将无限趋于锚点。直至截图位于原图内部。
-    box[0] = point[0] - (width / 2) = 200 
-    box[1] = point[1] - (height / 2) = 100
-    box[2] = point[0] + (width / 2) = 400
-    box[3] = point[1] + (height / 2) = 300
-
-    # 偏移
-    # 如果偏移后边界超出原图，将再次对偏移进行修正。
-    box[0] += dx = 210
-    box[1] += dy = 110
-    box[2] += dx = 410
-    box[3] += dy = 310
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200a10a10)
 
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200-10a10
 
-    <ImageDownloadURI>?imageMogr/gravity/Center/crop/!200x200-10a10
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-
-    width = 200 # 裁剪图宽度
-    height = 200 # 裁剪图高度
-
-    dx = 10 # 宽度进去10像素
-    dy = 10 # 向下偏移10像素
-
-    width -= dx = 190 # 宽度减去dx像素
-    
-    # gravity = Center
-    point = (w / 2, h / 2) = (300, 200) # 偏移锚点
-    # 裁剪图中心先趋于偏移锚点，后偏移。但是始终在原图范围内。
-    # 以偏移锚点为中心上下左右均分。
-    # 如果计算出来的边距为负或者大于原图宽高，则进行修正。
-    # 修正规则为，截图中心将无限趋于锚点。直至截图位于原图内部。
-    box[0] = point[0] - (width / 2) = 205 
-    box[1] = point[1] - (height / 2) = 100
-    box[2] = point[0] + (width / 2) = 395
-    box[3] = point[1] + (height / 2) = 300
-
-    # 偏移
-    # 如果偏移后边界超出原图，将再次对偏移进行修正。
-    box[1] += dy = 110
-    box[3] += dy = 310
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200-10a10)
 
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200a10-10
 
-    <ImageDownloadURI>?imageMogr/gravity/Center/crop/!200x200a10-10
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-
-    width = 200 # 裁剪图宽度
-    height = 200 # 裁剪图高度
-
-    dx = 10 # 向右偏移10像素
-    dy = 10 # 高度减去10像素
-    
-    height -= dy = 190
-
-    # gravity = Center
-    point = (w / 2, h / 2) = (300, 200) # 偏移锚点
-    # 裁剪图中心先趋于偏移锚点，后偏移。但是始终在原图范围内。
-    # 以偏移锚点为中心上下左右均分。
-    # 如果计算出来的边距为负或者大于原图宽高，则进行修正。
-    # 修正规则为，截图中心将无限趋于锚点。直至截图位于原图内部。
-    box[0] = point[0] - (width / 2) = 200 
-    box[1] = point[1] - (height / 2) = 105
-    box[2] = point[0] + (width / 2) = 400
-    box[3] = point[1] + (height / 2) = 295
-
-    # 偏移
-    # 如果偏移后边界超出原图，将再次对偏移进行修正。
-    box[0] += dx = 210
-    box[2] += dx = 410
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200a10-10)
 
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200-10-10
 
-    <ImageDownloadURI>?imageMogr/gravity/Center/crop/!200x200-10-10
-
-##### 计算过程
-    
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-
-    width = 200 # 裁剪图宽度
-    height = 200 # 裁剪图高度
-
-    dx = 10 # 宽度减去10像素
-    dy = 10 # 高度减去10像素
-    
-    width -= dx = 190
-    height -= dy = 190
-
-    # gravity = Center
-    point = (w / 2, h / 2) = (300, 200) # 偏移锚点
-    # 裁剪图中心先趋于偏移锚点，后偏移。但是始终在原图范围内。
-    # 以偏移锚点为中心上下左右均分。
-    # 如果计算出来的边距为负或者大于原图宽高，则进行修正。
-    # 修正规则为，截图中心将无限趋于锚点。直至截图位于原图内部。
-    box[0] = point[0] - (width / 2) = 205 
-    box[1] = point[1] - (height / 2) = 105
-    box[2] = point[0] + (width / 2) = 395
-    box[3] = point[1] + (height / 2) = 295
-
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200-10-10)
 
 ### 水印处理（watermark）
 
 #### 描述
 此接口提供图片水印、文字水印
-
 
 #### 图片水印
 
@@ -688,31 +361,11 @@ tornado (4.0.2)
     GET <imageDownloadURI>?<接口规格> HTTP/1.1
 
 
-##### 图片水印示例
+##### 文字水印示例
 
-##### 请求参数
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?watermark/2/gravity/SouthEast/text/5Zu-54mH5rC05Y2w/font/6buR5L2T/fontsize/20/dx/15/dy/15
 
-    <ImageDownloadURI>?watermark/2/gravity/SouthEast/text/5Zu-54mH5rC05Y2w/font/6buR5L2T/fontsize/20/dx/15/dy/15
-
-
-##### 计算过程
-
-    w = 600 # 原图宽为600像素
-    h = 400 # 原图高为400像素
-    dx = 15 # 横向边界
-    dy = 15 # 纵向边界
-
-    # load水印图片。假设水印图片宽100像素，高30像素
-    # 水印图片大小不能大于原图
-    mark_im_size = (100, 30)
-
-    # 获得偏移锚点 偏移参数为SouthEast
-    point = (w, h) = (600, 400)
-
-    # 根据偏移参数重置锚点
-    # 如果偏移后边界超出底图，则重置偏移位
-    re_point[0] = point[0] - (mark_im_size[0] + dx) = 485
-    re_point[1] = point[1] - (mark_im_size[1] + dy) = 355
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?watermark/2/gravity/SouthEast/text/5Zu-54mH5rC05Y2w/font/6buR5L2T/fontsize/20/dx/15/dy/15)
 
 
 
