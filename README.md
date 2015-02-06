@@ -235,14 +235,14 @@ tornado (4.0.2)
 ![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300!)
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300>
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300<
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300>)
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/500x300<)
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/800x800<
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/800x800>
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/800x800<)
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/800x800>)
 
 
     http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/thumbnail/3600000@
@@ -269,24 +269,24 @@ tornado (4.0.2)
 **偏移裁剪**
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200a10a10
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!300x300a10a10
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200a10a10)
-
-
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200-10a10
-
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200-10a10)
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!300x300a10a10)
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200a10-10
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!300x300-10a10
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200a10-10)
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!300x300-10a10)
 
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200-10-10
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!300x300a10-10
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!200x200-10-10)
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!300x300a10-10)
+
+
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!300x300-10-10
+
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageMogr/gravity/Center/crop/!300x300-10-10)
 
 ### 水印处理（watermark）
 
@@ -360,15 +360,115 @@ tornado (4.0.2)
 
     GET <imageDownloadURI>?<接口规格> HTTP/1.1
 
+##### 图片水印
+
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?watermark/1/gravity/SouthEast/image/NTRkNDY2MDhlMTM4MjM5YTUxYmZkYWQwLnBuZw==/dx/10/dy/10
+
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?watermark/1/gravity/SouthEast/image/NTRkNDY2MDhlMTM4MjM5YTUxYmZkYWQwLnBuZw==/dx/15/dy/15)
 
 ##### 文字水印示例
 
-    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?watermark/2/gravity/SouthEast/text/5Zu-54mH5rC05Y2w/font/6buR5L2T/fontsize/20/dx/15/dy/15
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?watermark/2/gravity/SouthEast/text/QERvb2dJbWFnZQ==/font/Y29uc29sYXM=/fontsize/20/dx/15/dy/15
 
-![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?watermark/2/gravity/SouthEast/text/5Zu-54mH5rC05Y2w/font/6buR5L2T/fontsize/20/dx/15/dy/15)
-
-
+![](http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?watermark/2/gravity/SouthEast/text/QERvb2dJbWFnZQ==/font/Y29uc29sYXM=/fontsize/20/dx/15/dy/15)
 
 
+### 图片基本信息（imageInfo）
+
+#### 描述
+图片基本信息包括图片格式、图片大小、色彩模型。  
+在图片下载URL后附加imageInfo指示符（区分大小写），即可获取JSON格式的图片基本信息。
+
+#### 请求
+
+##### 请求报文格式
+    GET <imageDownloadUri>?imageInfo HTTP/1.1
+
+#### 示例
+
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageInfo
+
+    {
+        "width": 640, 
+        "height": 427, 
+        "colorModel": "RGB", 
+        "format": "JPEG"
+    }
 
 
+### 图片EXIF信息（exif）
+
+#### 描述
+EXIF（EXchangeable Image File Format）是专门为数码相机的照片设定的可交换图像文件格式，通过在图片下载URL后附加exif指示符（区分大小写）获取。  
+
+注意：缩略图等经过云处理的新图片不支持该方法。
+
+#### 请求
+
+##### 请求报文格式
+    GET <imageDownloadUri>?exif HTTP/1.1
+
+#### 示例
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?exif   
+
+    {
+        "YResolution": [72, 1],
+        "ResolutionUnit": 2,
+        "Make": "Canon",
+        "Flash": 16,
+        "SceneCaptureType": 0,
+        "DateTime": "2011:11:19 17:09:23",
+        "MeteringMode": 5,
+        "XResolution": [72, 1],
+        "LensSpecification": [
+            [18, 1],
+            [55, 1],
+            [0, 1],
+            [0, 1]
+        ],
+        "ExposureProgram": 3,
+        "ColorSpace": 1,
+        "ExifImageWidth": 640,
+        "DateTimeDigitized": "2011:11:19 17:09:23",
+        "DateTimeOriginal": "2011:11:19 17:09:23",
+        "LensModel": "EF-S18-55mm f/3.5-5.6 IS II",
+        "LensSerialNumber": "000030d5d1",
+        "WhiteBalance": 0,
+        "FNumber": [28, 5],
+        "CustomRendered": 0,
+        "ApertureValue": [5, 1],
+        "FocalLength": [45, 1],
+        "SubsecTimeOriginal": "11",
+        "ExposureMode": 0,
+        "BodySerialNumber": "094053007294",
+        "ComponentsConfiguration": "\u0000\u0000\u0000\u0000",
+        "FocalPlaneXResolution": [97379, 17],
+        "ExifOffset": 168,
+        "ExifImageHeight": 427,
+        "SubsecTimeDigitized": "11",
+        "ISOSpeedRatings": 3200,
+        "Model": "Canon EOS 600D",
+        "Orientation": 1,
+        "ExposureTime": [1, 50],
+        "FocalPlaneYResolution": [331079, 57],
+        "SubsecTime": "11",
+        "MaxApertureValue": [20599, 3971],
+        "FlashPixVersion": "0100",
+        "FocalPlaneResolutionUnit": 2,
+        "ExifVersion": "0230"
+    }
+
+
+### 图片主色调（imageAve）
+
+#### 描述
+本接口用于计算一幅图片的平均色调，并以0xRRGGBB形式返回。
+
+#### 请求
+##### 请求报文格式
+    GET <imageDownloadUri>?imageAve HTTP/1.1
+
+#### 示例
+    http://10.101.110.17:8888/54d46603e138239a51bfdacf.jpg?imageAve
+
+    {"RGB": "0x050503"}
