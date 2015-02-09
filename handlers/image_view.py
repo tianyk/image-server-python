@@ -92,8 +92,6 @@ class ImageViewHandler(BaseImageHandler):
             if format:  # 首先校验format是否被支持
                 ext = format
 
-            image_data = image_utils.get_image_data(im, filename, ext, interlace)
-
             if interlace:
                 self.write_image(im, filename, ext, interlace=interlace)
             else:

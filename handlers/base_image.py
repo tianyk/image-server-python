@@ -200,10 +200,7 @@ class BaseImageHandler(tornado.web.RequestHandler):
         return self._validationErrors
 
     def write_image_no_cache(self, im, file_name, ext, interlace='0'):
-        pass
-
-    # @cache.cache_image
-    def write_image(self, im, file_name, ext, interlace='0'):
+        # TODO cache时多计算了一遍。怎么更好的做到无侵入，重用？
         image_data = image_utils.get_image_data(im, file_name, ext, interlace)
 
         content_type = MIME.get(ext.lower(), "image/jpeg")
@@ -212,6 +209,10 @@ class BaseImageHandler(tornado.web.RequestHandler):
         self.set_header("Expires", expiry_time.strftime("%a, %d %b %Y %H:%M:%S GMT"))
         # self.set_header("Cache-Control", "max-age=" + str(10 * 365 * 24 * 60 * 60))
         self.write(image_data)
+
+    @cache.cache_image
+    def write_image(self, im, file_name, ext, interlace='0'):
+        self.write_image_no_cache(im, file_name, ext, interlace)
 
     def write_check_errors(self, obj, status_code=400):
         try:
