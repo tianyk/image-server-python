@@ -9,7 +9,7 @@ from PIL import Image, ExifTags
 from base_image import BaseImageHandler
 from libs import image_utils, upload, download, fonts
 from libs.errors import InvalidRequestError, ImageWaterMark, FileNotFoundError, InvalidImageError, FontNotSupport
-from libs import validator
+from libs import validator, cache
 
 TEMP_DIR = "temp/"
 IMAGE_INFO = "imageInfo"
@@ -21,6 +21,7 @@ IMAGE_AVE = "imageAve"
 
 
 class ImageViewHandler(BaseImageHandler):
+    @cache.load_image
     def get(self, filename, ext):
         file_path = upload.get_file_path(filename, ext)
         if not file_path:
@@ -90,6 +91,8 @@ class ImageViewHandler(BaseImageHandler):
 
             if format:  # 首先校验format是否被支持
                 ext = format
+
+            image_data = image_utils.get_image_data(im, filename, ext, interlace)
 
             if interlace:
                 self.write_image(im, filename, ext, interlace=interlace)

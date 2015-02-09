@@ -4,7 +4,8 @@
 import copy
 import inspect
 import urllib
-from libs import errors
+
+from libs import errors, image_utils
 
 try:
     from cStringIO import StringIO
@@ -13,8 +14,7 @@ except ImportError:
 import datetime
 import json
 import tornado.web
-from PIL import ImageFile
-from libs import MIME, validator
+from libs import MIME, validator, cache
 
 IMAGE_INFO = "imageInfo"
 IMAGE_VIEW = "imageView"
@@ -22,16 +22,6 @@ EXIF = "exif"
 IMAGE_MOGR = "imageMogr"
 WATER_MARK = "watermark"
 IMAGE_AVE = "imageAve"
-
-# @see https://infohost.nmt.edu/tcc/help/pubs/pil/formats.html
-# http://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html
-IMAGE_FORMATS = {
-    "jpg": "JPEG",
-    "gif": "GIF",
-    "png": "PNG",
-    "webp": "WebP"
-}
-
 
 def find_pox(arr, item):
     for i, value in enumerate(arr):
@@ -209,33 +199,19 @@ class BaseImageHandler(tornado.web.RequestHandler):
             return errors
         return self._validationErrors
 
+    def write_image_no_cache(self, im, file_name, ext, interlace='0'):
+        pass
+
+    # @cache.cache_image
     def write_image(self, im, file_name, ext, interlace='0'):
-        output = StringIO()
-        format = IMAGE_FORMATS.get(ext.lower(), "JPEG")
+        image_data = image_utils.get_image_data(im, file_name, ext, interlace)
 
-        if interlace == '1':
-            try:
-                im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
-            except IOError:
-                ImageFile.MAXBLOCK = im.size[0] * im.size[1]
-                im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
-        else:
-            im.save(output, format, quality=80)
-        img_data = output.getvalue()
-        output.close()
-
-        contentType = MIME.get(ext.lower(), "image/jpeg")
-        self.set_header("Content-Type", contentType)
+        content_type = MIME.get(ext.lower(), "image/jpeg")
+        self.set_header("Content-Type", content_type)
         expiry_time = datetime.datetime.utcnow() + datetime.timedelta(100)
         self.set_header("Expires", expiry_time.strftime("%a, %d %b %Y %H:%M:%S GMT"))
-        # self.set_header("Cache-Control", "max-age=" + str(24 * 60 * 60))
-        self.write(img_data)
-
-    # def write_blank(self):
-    #     self.set_status(404)
-    #     self.set_header("Content-Type", "text/plain")
-    #     self.set_header("Cache-Control", "no-store")
-    #     self.write("This request URL " + self.request.path + " was not found on this server.")
+        # self.set_header("Cache-Control", "max-age=" + str(10 * 365 * 24 * 60 * 60))
+        self.write(image_data)
 
     def write_check_errors(self, obj, status_code=400):
         try:

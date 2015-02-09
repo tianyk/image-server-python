@@ -6,9 +6,39 @@ import re
 import math
 import colorsys
 import optparse
-from PIL import Image, ImageFilter, ImageColor, ImageFont, ImageDraw
+from PIL import Image, ImageFilter, ImageColor, ImageFont, ImageDraw, ImageFile
 from libs import fonts, errors
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
+# @see https://infohost.nmt.edu/tcc/help/pubs/pil/formats.html
+# http://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html
+IMAGE_FORMATS = {
+    "jpg": "JPEG",
+    "gif": "GIF",
+    "png": "PNG",
+    "webp": "WebP"
+}
+
+
+def get_image_data(im, file_name, ext, interlace='0'):
+    output = StringIO()
+    format = IMAGE_FORMATS.get(ext.lower(), "JPEG")
+
+    if interlace == '1':
+        try:
+            im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
+        except IOError:
+            ImageFile.MAXBLOCK = im.size[0] * im.size[1]
+            im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
+    else:
+        im.save(output, format, quality=80)
+    image_data = output.getvalue()
+    output.close()
+
+    return image_data
 
 def image_view_mode_0(im, long_edge, short_edge):
     """
