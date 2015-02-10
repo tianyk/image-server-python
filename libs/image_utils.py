@@ -17,22 +17,24 @@ except ImportError:
 # http://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html
 IMAGE_FORMATS = {
     "jpg": "JPEG",
+    "jpeg": "JPEG",
     "gif": "GIF",
     "png": "PNG",
     "webp": "WebP"
 }
 
 
-def get_image_data(im, file_name, ext, interlace='0'):
+def get_image_data(im, filename, format, interlace="0", quality=80):
     output = StringIO()
-    format = IMAGE_FORMATS.get(ext.lower(), "JPEG")
+    format = IMAGE_FORMATS.get(format.lower(), "JPEG")
 
+    # 只有JPEG才支持渐进式显示
     if interlace == '1':
         try:
-            im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
+            im.save(output, "JPEG", quality, optimize=True, progressive=True)
         except IOError:
             ImageFile.MAXBLOCK = im.size[0] * im.size[1]
-            im.save(output, "JPEG", quality=80, optimize=True, progressive=True)
+            im.save(output, "JPEG", quality, optimize=True, progressive=True)
     else:
         im.save(output, format, quality=80)
     image_data = output.getvalue()

@@ -1,0 +1,1 @@
+#!/usr/bin/env python# -*- coding: utf-8 -*-__author__ = 'tyk'from PIL import Imageim = Image.open("./20150202152725.png")print im.formatprint im.format_descriptionprint dir(im)

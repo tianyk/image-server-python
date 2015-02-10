@@ -26,7 +26,7 @@ class UploadHandler(BaseImageHandler):
                 with open("/".join(file_path), "wb") as f:
                     f.write(file["body"])
 
-                self.write_check_errors({"file_path": file_path[1]})
+                self.write({"file_path": file_path[1]})
             else:
                 self.write('Unsupported format')
 

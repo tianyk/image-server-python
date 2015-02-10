@@ -35,12 +35,13 @@ class ImageViewHandler(BaseImageHandler):
         # 接口标识
         interface = self.get_argument("interface", None)
         if not interface:  # 直接返回原图
-            self.write_image(im, filename, ext)
+            image_data = image_utils.get_image_data(im, filename, ext)
+            self.write_image(image_data, ext)
 
         elif IMAGE_INFO == interface:  # 图片基本信息
             size = im.size
             info = {}
-            info["format"] = im.format or 'None'
+            info["format"] = im.format or "None"
             info["width"] = size[0]
             info["height"] = size[1]
             info["colorModel"] = im.mode
@@ -54,14 +55,16 @@ class ImageViewHandler(BaseImageHandler):
 
             errors = self.validation_errors()
             if errors:
-                self.write_check_errors(errors)
+                self.write(errors)
                 return
 
             mode = self.get_argument("mode", None)
             w = self.get_argument("w", None)
             h = self.get_argument("h", None)
-            format = self.get_argument("format", None)
-            interlace = self.get_argument("interlace", None)
+            # 默认是原格式
+            format = self.get_argument("format", ext)
+            # 默认不支持渐进式
+            interlace = self.get_argument("interlace", "0")
 
             size = im.size
             if "0" == mode:
@@ -89,13 +92,12 @@ class ImageViewHandler(BaseImageHandler):
                 if re_im:
                     im = re_im
 
-            if format:  # 首先校验format是否被支持
-                ext = format
+            # 只有JPEG格式才支持渐进式图片
+            if interlace == "1":
+                format = "jpg"
 
-            if interlace:
-                self.write_image(im, filename, ext, interlace=interlace)
-            else:
-                self.write_image(im, filename, ext)
+            image_data = image_utils.get_image_data(im, filename, format, interlace)
+            self.write_image(image_data, format)
 
         elif EXIF == interface:
             exif = im._getexif()
@@ -103,7 +105,7 @@ class ImageViewHandler(BaseImageHandler):
                 # dict(zip(d.keys(), map(lambda x:x * 2, d.values())))
                 # dict((k, v*2) for k, v in {'a': 1, 'b': 2}.items())
                 exif = dict((ExifTags.TAGS.get(k, k), v) for k, v in exif.items() if k in ExifTags.TAGS)
-                self.write_check_errors(exif)
+                self.write(exif)
             else:
                 # self.write({"errcode": 400, "errmsg": "no exif info"})
                 raise FileNotFoundError(filename + "." + ext)
@@ -141,15 +143,15 @@ class ImageViewHandler(BaseImageHandler):
                     if "True" == blur:
                         im = image_utils.image_mogr_blur(im)
 
-            format = self.get_argument("format", None)
-            interlace = self.get_argument("interlace", None)
-            if format:  # 首先校验format是否被支持
-                ext = format
+            format = self.get_argument("format", ext)
+            interlace = self.get_argument("interlace", "0")
 
-            if interlace:
-                self.write_image(im, filename, ext, interlace)
-            else:
-                self.write_image(im, filename, ext)
+            # 只有JPEG格式才支持渐进式图片
+            if interlace == "1":
+                format = "jpg"
+
+            image_data = image_utils.get_image_data(im, filename, format, interlace)
+            self.write_image(image_data, format)
 
         elif WATER_MARK == interface:
             mode = self.get_argument("mode", None)
@@ -162,7 +164,7 @@ class ImageViewHandler(BaseImageHandler):
 
                 errors = self.validation_errors()
                 if errors:
-                    self.write_check_errors(errors)
+                    self.write(errors)
                     return
 
                 # 图片水印
@@ -196,7 +198,7 @@ class ImageViewHandler(BaseImageHandler):
 
                 errors = self.validation_errors()
                 if errors:
-                    self.write_check_errors(errors)
+                    self.write(errors)
                     return
 
                 # 文字水印
@@ -220,17 +222,19 @@ class ImageViewHandler(BaseImageHandler):
                 im = image_utils.image_water_mark_text(im, text, font=font, fontsize=int(fontsize), fill=fill,
                                                        dissolve=dissolve, gravity=gravity, dx=int(dx), dy=int(dy))
 
-            format = self.get_argument("format", None)
-            interlace = self.get_argument("interlace", None)
-            if format:  # 首先校验format是否被支持
-                ext = format
+            format = self.get_argument("format", ext)
+            interlace = self.get_argument("interlace", "0")
 
-            if interlace:
-                self.write_image(im, filename, ext, interlace)
-            else:
-                self.write_image(im, filename, ext)
+            # 只有JPEG格式才支持渐进式图片
+            if interlace == "1":
+                format = "jpg"
+
+            image_data = image_utils.get_image_data(im, filename, format, interlace)
+            self.write_image(image_data, format)
+
         elif IMAGE_AVE == interface:
             im_ave = image_utils.image_ave(im)
-            self.write_check_errors({im.mode: im_ave})
+            self.write({im.mode: im_ave})
         else:  # 直接返回原图
-            self.write_image(im, filename, ext)
+            image_data = image_utils.get_image_data(im, filename, ext)
+            self.write_image(image_data, ext)
