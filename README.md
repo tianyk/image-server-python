@@ -6,6 +6,7 @@ tornado (4.0.2)
 
 ### 依赖库
 * 图像处理 Pillow (2.7.0)
+* 缓存 python-memcached (1.53)
 
 
 ## 接口说明
