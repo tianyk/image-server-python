@@ -111,8 +111,15 @@ class ImageViewHandler(BaseImageHandler):
                 raise FileNotFoundError(filename + "." + ext)
 
         elif IMAGE_MOGR == interface:
-            self.check("NorthWest")["is_in"](["NorthWest", "North", "NorthEast",
-                                              "West", "Center", "East", "SouthWest", "South", "SouthEast"])
+            self.check("gravity")["is_in"](["NorthWest", "North", "NorthEast", "West",
+                                            "Center", "East", "SouthWest", "South", "SouthEast"])
+            self.check("format", "Unsupported format")["is_in"](["jpg", "jpeg", "gif", "png"])
+
+            errors = self.validation_errors()
+            if errors:
+                # self.write(errors)
+                self.write_error(400, **errors)
+                return
 
             args = self.query.split("/")
             # 保证顺序

@@ -218,7 +218,8 @@ class BaseImageHandler(tornado.web.RequestHandler):
                 self.set_header("Content-Type", "application/json; charset=UTF-8")
                 self.write(res)
                 return
-
+        if status_code == 400:
+            super(BaseImageHandler, self).write_error(status_code, **kwargs)
         if status_code == 404:
             self.render('404.html')
         elif status_code == 500:
