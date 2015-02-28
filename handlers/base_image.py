@@ -23,7 +23,14 @@ IMAGE_MOGR = "imageMogr"
 WATER_MARK = "watermark"
 IMAGE_AVE = "imageAve"
 
-def find_pox(arr, item):
+
+def item_index(arr, item):
+    """
+    获取元素在列表中的索引
+    :param arr:
+    :param item:
+    :return:
+    """
     for i, value in enumerate(arr):
         if value == item:
             return i
@@ -31,6 +38,17 @@ def find_pox(arr, item):
 
 
 def merge_dict(source, target):
+    """
+    合并两个字典。合并后的字典的value是一个列表。
+    eg:
+    doog_1 = {name: 'wangwang', age: 10}
+    doog_2 = {name: 'wang~', gender: '♂'}
+    合并以后
+    doog = {name: ['wangwang', 'wang~'], age: 10, gender: '♂'}
+    :param source:
+    :param target:
+    :return:
+    """
     # keys = [key for key in source]
     keys = list(source)[:]
     keys += [key for key in target if not key in keys]
@@ -84,7 +102,7 @@ def parse_qs(query):
         for arg_name in args_name:
             if arg_name in args:
                 try:
-                    encoded[arg_name] = args[find_pox(args, arg_name) + 1]
+                    encoded[arg_name] = args[item_index(args, arg_name) + 1]
                 except IndexError:
                     pass
                 except TypeError:
@@ -106,6 +124,11 @@ def parse_qs(query):
 
 
 def check_param(self, getter):
+    """
+    参数校验
+    :param getter:
+    :return:
+    """
     def check_handler(param, fail_msg="Invalid value"):
         value = getter(param)
         methods = {}
